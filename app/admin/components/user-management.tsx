@@ -27,25 +27,55 @@ interface UserManagementProps {
   onDelete: (id: string) => Promise<void>
 }
 
+const CONTEST_PRICES = {
+  hackathon: 1000,
+  robotics: 800,
+  gaming: 500,
+  "ai-challenge": 900,
+  "startup-pitch": 700,
+  coding: 500,
+  quiz: 300,
+  project: 1000,
+}
+
 export function UserManagement({ participants, isLoading, onUpdate, onDelete }: UserManagementProps) {
   const [editingParticipant, setEditingParticipant] = useState<ParticipantData | null>(null)
+  const [editingPaymentStatus, setEditingPaymentStatus] = useState<string | null>(null)
+  const [editingRollNumber, setEditingRollNumber] = useState<string | null>(null)
+  const [editingName, setEditingName] = useState<string | null>(null)
+  const [editingEmail, setEditingEmail] = useState<string | null>(null)
+  const [editingDepartment, setEditingDepartment] = useState<string | null>(null)
+  const [editingContest, setEditingContest] = useState<string | null>(null)
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
 
   const handleEdit = (participant: ParticipantData) => {
     setEditingParticipant(participant)
+    setEditingPaymentStatus(participant.paymentStatus || 'not paid')
+    setEditingRollNumber(participant.rollNumber || '')
+    setEditingName(participant.name || '')
+    setEditingEmail(participant.email || '')
+    setEditingDepartment(participant.department || '')
+    setEditingContest(participant.contest || '')
   }
 
   const handleUpdate = async () => {
     if (!editingParticipant || !editingParticipant.id) return
-
     try {
       await onUpdate(editingParticipant.id, {
-        name: editingParticipant.name,
-        rollNumber: editingParticipant.rollNumber,
-        department: editingParticipant.department,
-        contest: editingParticipant.contest,
+        name: editingName,
+        email: editingEmail,
+        rollNumber: editingRollNumber,
+        department: editingDepartment,
+        contest: editingContest,
+        paymentStatus: editingPaymentStatus,
       })
       setEditingParticipant(null)
+      setEditingPaymentStatus(null)
+      setEditingRollNumber(null)
+      setEditingName(null)
+      setEditingEmail(null)
+      setEditingDepartment(null)
+      setEditingContest(null)
     } catch (error) {
       console.error("Error updating participant:", error)
     }
@@ -79,8 +109,10 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
           <TableRow>
             <TableHead className="text-gray-300">Name</TableHead>
             <TableHead className="text-gray-300">Email</TableHead>
+            <TableHead className="text-gray-300">Roll Number</TableHead>
             <TableHead className="text-gray-300">Department</TableHead>
             <TableHead className="text-gray-300">Contest</TableHead>
+            <TableHead className="text-gray-300">Payment Status</TableHead>
             <TableHead className="text-gray-300">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -89,8 +121,10 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
             <TableRow key={participant.id}>
               <TableCell className="text-white">{participant.name}</TableCell>
               <TableCell className="text-white">{participant.email}</TableCell>
+              <TableCell className="text-white">{participant.rollNumber}</TableCell>
               <TableCell className="text-white">{participant.department}</TableCell>
               <TableCell className="text-white">{participant.contest}</TableCell>
+              <TableCell className="text-white">{participant.paymentStatus || 'not paid'}</TableCell>
               <TableCell>
                 <div className="flex space-x-2">
                   <Dialog>
@@ -113,76 +147,62 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
                       </DialogHeader>
                       <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                          <Label htmlFor="name" className="text-white">
-                            Name
-                          </Label>
+                          <Label htmlFor="name" className="text-white">Name</Label>
                           <Input
                             id="name"
-                            value={editingParticipant?.name}
-                            onChange={(e) =>
-                              setEditingParticipant(
-                                editingParticipant
-                                  ? { ...editingParticipant, name: e.target.value }
-                                  : null
-                              )
-                            }
+                            value={editingName || ''}
+                            onChange={(e) => setEditingName(e.target.value)}
                             className="bg-darkBlue/50 border-gray-700 text-white"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="rollNumber" className="text-white">
-                            Roll Number
-                          </Label>
+                          <Label htmlFor="email" className="text-white">Email</Label>
+                          <Input
+                            id="email"
+                            value={editingEmail || ''}
+                            onChange={(e) => setEditingEmail(e.target.value)}
+                            className="bg-darkBlue/50 border-gray-700 text-white"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="rollNumber" className="text-white">Roll Number</Label>
                           <Input
                             id="rollNumber"
-                            value={editingParticipant?.rollNumber}
-                            onChange={(e) =>
-                              setEditingParticipant(
-                                editingParticipant
-                                  ? { ...editingParticipant, rollNumber: e.target.value }
-                                  : null
-                              )
-                            }
+                            value={editingRollNumber || ''}
+                            onChange={(e) => setEditingRollNumber(e.target.value)}
                             className="bg-darkBlue/50 border-gray-700 text-white"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="department" className="text-white">
-                            Department
-                          </Label>
+                          <Label htmlFor="department" className="text-white">Department</Label>
                           <Input
                             id="department"
-                            value={editingParticipant?.department}
-                            onChange={(e) =>
-                              setEditingParticipant(
-                                editingParticipant
-                                  ? { ...editingParticipant, department: e.target.value }
-                                  : null
-                              )
-                            }
+                            value={editingDepartment || ''}
+                            onChange={(e) => setEditingDepartment(e.target.value)}
                             className="bg-darkBlue/50 border-gray-700 text-white"
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="contest" className="text-white">
-                            Contest
-                          </Label>
+                          <Label htmlFor="contest" className="text-white">Contest</Label>
+                          <Input
+                            id="contest"
+                            value={editingContest || ''}
+                            onChange={(e) => setEditingContest(e.target.value)}
+                            className="bg-darkBlue/50 border-gray-700 text-white"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="paymentStatus" className="text-white">Payment Status</Label>
                           <Select
-                            value={editingParticipant?.contest}
-                            onValueChange={(value) =>
-                              setEditingParticipant(
-                                editingParticipant ? { ...editingParticipant, contest: value } : null
-                              )
-                            }
+                            value={editingPaymentStatus || 'not paid'}
+                            onValueChange={setEditingPaymentStatus}
                           >
                             <SelectTrigger className="bg-darkBlue/50 border-gray-700 text-white">
-                              <SelectValue placeholder="Select a contest" />
+                              <SelectValue placeholder="Select status" />
                             </SelectTrigger>
                             <SelectContent className="bg-darkBlue border-gray-700">
-                              <SelectItem value="coding">Coding Competition</SelectItem>
-                              <SelectItem value="quiz">Tech Quiz</SelectItem>
-                              <SelectItem value="project">Project Showcase</SelectItem>
-                              <SelectItem value="gaming">Gaming Tournament</SelectItem>
+                              <SelectItem value="not paid">Not Paid</SelectItem>
+                              <SelectItem value="paid">Paid</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>

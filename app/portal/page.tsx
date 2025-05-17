@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2, Calendar, MapPin, Users, Clock, Trophy, Info, User } from "lucide-react"
 import ParticlesBackground from "@/components/particles-background"
 import type { ParticipantData } from "@/lib/firebase/firebase-provider"
+import PaymentSection from './components/payment-section'
 
 // Contest details
 const contestDetails = {
@@ -135,6 +136,34 @@ const contestDetails = {
   },
 }
 
+const CONTEST_PRICES = {
+  hackathon: {
+    amount: 1000,
+    currency: 'PKR',
+    description: 'Hackathon Registration Fee'
+  },
+  robotics: {
+    amount: 800,
+    currency: 'PKR',
+    description: 'Robotics Challenge Fee'
+  },
+  gaming: {
+    amount: 500,
+    currency: 'PKR',
+    description: 'Gaming Tournament Fee'
+  },
+  "ai-challenge": {
+    amount: 900,
+    currency: 'PKR',
+    description: 'AI Challenge Registration Fee'
+  },
+  "startup-pitch": {
+    amount: 700,
+    currency: 'PKR',
+    description: 'Startup Pitch Competition Fee'
+  }
+}
+
 export default function PortalPage() {
   const router = useRouter()
   const { user, loading, getUserParticipation } = useFirebase()
@@ -142,30 +171,30 @@ export default function PortalPage() {
   const [participant, setParticipant] = useState<ParticipantData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const reloadParticipant = async () => {
+    if (user?.email) {
+      try {
+        const data = await getUserParticipation(user.email)
+        setParticipant(data)
+      } catch (error) {
+        console.error("Error fetching participant data:", error)
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    if (user) reloadParticipant()
+  }, [user])
+
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login?redirect=/portal")
     }
   }, [loading, user, router])
-
-  useEffect(() => {
-    const fetchParticipantData = async () => {
-      if (user?.email) {
-        try {
-          const data = await getUserParticipation(user.email)
-          setParticipant(data)
-        } catch (error) {
-          console.error("Error fetching participant data:", error)
-        } finally {
-          setIsLoading(false)
-        }
-      }
-    }
-
-    if (user) {
-      fetchParticipantData()
-    }
-  }, [user, getUserParticipation])
 
   if (loading || isLoading) {
     return (
@@ -354,6 +383,12 @@ export default function PortalPage() {
             </CardContent>
           </Card>
         </motion.div>
+
+        <PaymentSection
+          participant={participant}
+          reloadParticipant={reloadParticipant}
+          paymentDetails={CONTEST_PRICES[participant.contest as keyof typeof CONTEST_PRICES]}
+        />
       </div>
     </div>
   )

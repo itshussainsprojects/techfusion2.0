@@ -12,11 +12,16 @@ service cloud.firestore {
       return request.auth != null && request.auth.token.email == resource.data.email;
     }
 
+    // Helper function to check if user is accessing their own payment
+    function isOwnPayment() {
+      return request.auth != null && request.auth.token.email == resource.data.userEmail;
+    }
+
     // Allow authenticated users to read and create participants
     match /participants/{participantId} {
-      allow read: if request.auth != null && (isAdmin() || isOwnData());
+      allow read: if request.auth != null;
       allow create: if request.auth != null;
-      allow update, delete: if isAdmin();
+      allow update, delete: if isAdmin() || isOwnData();
     }
     
     // Users collection rules
@@ -24,6 +29,14 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow create: if request.auth != null;
       allow update, delete: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Payment collection rules
+    match /payments/{paymentId} {
+      allow read: if request.auth != null && (isAdmin() || isOwnPayment());
+      allow create: if request.auth != null;
+      allow update: if isAdmin() || (isOwnPayment() && resource.data.status == "pending");
+      allow delete: if isAdmin();
     }
   }
 }

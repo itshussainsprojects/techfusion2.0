@@ -15,11 +15,12 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth"
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where } from "firebase/firestore"
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, getDoc } from "firebase/firestore"
 import { firebaseConfig } from "./firebase-config"
 
 // Firebase imports
 import { Timestamp } from "firebase/firestore"
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage"
 
 // Initialize Firebase
 let app
@@ -42,6 +43,17 @@ try {
 }
 
 // Create context
+export type ParticipantData = {
+  id?: string
+  name: string
+  email: string
+  rollNumber: string
+  department: string
+  contest: string
+  timestamp?: Date
+  paymentStatus?: 'paid' | 'not paid'
+}
+
 type FirebaseContextType = {
   user: User | null
   loading: boolean
@@ -56,16 +68,6 @@ type FirebaseContextType = {
   deleteParticipant: (id: string) => Promise<void>
   checkIfRegistered: (email: string) => Promise<boolean>
   getUserParticipation: (email: string) => Promise<ParticipantData | null>
-}
-
-export type ParticipantData = {
-  id?: string
-  name: string
-  email: string
-  rollNumber: string
-  department: string
-  contest: string
-  timestamp?: Date
 }
 
 // List of admin emails
@@ -149,7 +151,6 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
 
   const registerParticipant = async (data: ParticipantData) => {
     if (!db) throw new Error("Firebase Firestore not initialized")
-
     try {
       const participantsRef = collection(db, "participants")
       const docRef = await addDoc(participantsRef, {
@@ -165,7 +166,6 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
 
   const getParticipants = async () => {
     if (!db) throw new Error("Firebase Firestore not initialized")
-
     try {
       const participantsRef = collection(db, "participants")
       const snapshot = await getDocs(participantsRef)
@@ -182,16 +182,16 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
 
   const updateParticipant = async (id: string, data: Partial<ParticipantData>) => {
     if (!db) throw new Error("Firebase Firestore not initialized")
-
     try {
       const participantRef = doc(db, "participants", id)
-      await updateDoc(participantRef, { 
-        ...data, 
-        timestamp: Timestamp.fromDate(new Date()) 
+      await updateDoc(participantRef, {
+        ...data,
+        timestamp: Timestamp.fromDate(new Date()),
+        paymentStatus: data.paymentStatus,
       })
     } catch (error) {
       console.error("Error updating participant:", error)
-      throw error
+      throw new Error("Error updating participant: " + (error as any)?.message)
     }
   }
 
@@ -223,7 +223,6 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
 
   const getUserParticipation = async (email: string) => {
     if (!db) throw new Error("Firebase Firestore not initialized")
-
     try {
       const participantsRef = collection(db, "participants")
       const q = query(participantsRef, where("email", "==", email))
@@ -231,14 +230,15 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
       if (snapshot.empty) return null
       const doc = snapshot.docs[0]
       const data = doc.data()
-      return { 
-        id: doc.id, 
+      return {
+        id: doc.id,
         name: data.name,
         email: data.email,
         rollNumber: data.rollNumber,
         department: data.department,
         contest: data.contest,
-        timestamp: data.timestamp?.toDate()
+        timestamp: data.timestamp?.toDate(),
+        paymentStatus: data.paymentStatus,
       } as ParticipantData
     } catch (error) {
       console.error("Error getting user participation:", error)
