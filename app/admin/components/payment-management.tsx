@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useFirebase } from '@/lib/firebase/firebase-provider'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,52 +12,85 @@ import { toast } from 'sonner'
 import type { PaymentData } from '@/lib/firebase/firebase-provider'
 
 export function PaymentManagement() {
-  const { getPayments, updatePaymentStatus } = useFirebase()
+  const { getPayments, updatePaymentStatus, getParticipants } = useFirebase()
   const [payments, setPayments] = useState<PaymentData[]>([])
+  const [participants, setParticipants] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [rejectionReason, setRejectionReason] = useState('')
   const [selectedPayment, setSelectedPayment] = useState<PaymentData | null>(null)
 
-  const loadPayments = async () => {
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setLoading(true);
     try {
-      const data = await getPayments()
-      setPayments(data)
+      // Load payments data
+      try {
+        const paymentsData = await getPayments();
+        if (Array.isArray(paymentsData)) {
+          setPayments(paymentsData);
+        } else {
+          console.warn("Payments data is not an array:", paymentsData);
+          setPayments([]);
+        }
+      } catch (paymentsError) {
+        console.error('Error loading payments:', paymentsError);
+        toast.error('Failed to load payments data');
+        setPayments([]);
+      }
+
+      // Load participants data
+      try {
+        const participantsData = await getParticipants();
+        if (Array.isArray(participantsData)) {
+          setParticipants(participantsData);
+        } else {
+          console.warn("Participants data is not an array:", participantsData);
+          setParticipants([]);
+        }
+      } catch (participantsError) {
+        console.error('Error loading participants:', participantsError);
+        toast.error('Failed to load participants data');
+        setParticipants([]);
+      }
     } catch (error) {
-      console.error('Error loading payments:', error)
-      toast.error('Failed to load payments')
+      console.error('Error in loadData:', error);
+      toast.error('Failed to load data');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleVerify = async (payment: PaymentData) => {
     try {
-      await updatePaymentStatus(payment.id!, 'verified')
-      toast.success('Payment verified successfully')
-      loadPayments()
+      await updatePaymentStatus(payment.id!, 'verified');
+      toast.success('Payment verified successfully. Participant status updated to PAID.');
+      loadData();
     } catch (error) {
-      console.error('Error verifying payment:', error)
-      toast.error('Failed to verify payment')
+      console.error('Error verifying payment:', error);
+      toast.error('Failed to verify payment');
     }
-  }
+  };
 
   const handleReject = async (payment: PaymentData) => {
     if (!rejectionReason) {
-      toast.error('Please provide a rejection reason')
-      return
+      toast.error('Please provide a rejection reason');
+      return;
     }
 
     try {
-      await updatePaymentStatus(payment.id!, 'rejected', rejectionReason)
-      toast.success('Payment rejected')
-      setSelectedPayment(null)
-      setRejectionReason('')
-      loadPayments()
+      await updatePaymentStatus(payment.id!, 'rejected', rejectionReason);
+      toast.success('Payment rejected. Participant status updated to NOT PAID.');
+      setSelectedPayment(null);
+      setRejectionReason('');
+      loadData();
     } catch (error) {
-      console.error('Error rejecting payment:', error)
-      toast.error('Failed to reject payment')
+      console.error('Error rejecting payment:', error);
+      toast.error('Failed to reject payment');
     }
-  }
+  };
 
   const downloadScreenshot = (url: string) => {
     window.open(url, '_blank')
@@ -86,72 +119,95 @@ export function PaymentManagement() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="text-gray-300">User</TableHead>
+                  <TableHead className="text-gray-300">Roll Number</TableHead>
                   <TableHead className="text-gray-300">Contest</TableHead>
                   <TableHead className="text-gray-300">Amount</TableHead>
-                  <TableHead className="text-gray-300">Method</TableHead>
+                  <TableHead className="text-gray-300">Date</TableHead>
                   <TableHead className="text-gray-300">Status</TableHead>
                   <TableHead className="text-gray-300">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {payments.map((payment) => (
-                  <TableRow key={payment.id}>
-                    <TableCell className="text-white">{payment.userEmail}</TableCell>
-                    <TableCell className="text-white">{payment.contestName}</TableCell>
-                    <TableCell className="text-white">{payment.amount} PKR</TableCell>
-                    <TableCell className="text-white">{payment.paymentMethod}</TableCell>
-                    <TableCell>
-                      {payment.status === 'verified' ? (
-                        <span className="flex items-center gap-2 text-green-500">
-                          <CheckCircle className="h-4 w-4" />
-                          Verified
-                        </span>
-                      ) : payment.status === 'rejected' ? (
-                        <span className="flex items-center gap-2 text-red-500">
-                          <XCircle className="h-4 w-4" />
-                          Rejected
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-2 text-yellow-500">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          Pending
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => downloadScreenshot(payment.screenshotUrl)}
-                          className="hover:bg-lightBlue/20"
-                        >
-                          <Download className="h-4 w-4 text-lightBlue" />
-                        </Button>
-                        {payment.status === 'pending' && (
-                          <>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleVerify(payment)}
-                              className="hover:bg-green-500/20"
-                            >
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            </Button>
-                            <Button
-                              variant="outline"
-                              size="icon"
-                              onClick={() => setSelectedPayment(payment)}
-                              className="hover:bg-red-500/20"
-                            >
-                              <XCircle className="h-4 w-4 text-red-500" />
-                            </Button>
-                          </>
+                {payments.map((payment) => {
+                  // Find the corresponding participant
+                  const participant = participants.find(p => p.id === payment.participantId);
+
+                  return (
+                    <TableRow key={payment.id} className={payment.status === 'pending' ? 'bg-yellow-500/5' : ''}>
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="text-white font-medium">{payment.userName}</span>
+                          <span className="text-gray-400 text-xs">{payment.userEmail}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-white">{payment.userRollNumber}</TableCell>
+                      <TableCell className="text-white">{payment.contestName}</TableCell>
+                      <TableCell className="text-white">{payment.amount} PKR</TableCell>
+                      <TableCell className="text-gray-300 text-sm">
+                        {payment.timestamp ? new Date(payment.timestamp).toLocaleDateString() : 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        {payment.status === 'verified' ? (
+                          <span className="flex items-center gap-2 text-green-500">
+                            <CheckCircle className="h-4 w-4" />
+                            Verified
+                          </span>
+                        ) : payment.status === 'rejected' ? (
+                          <span className="flex items-center gap-2 text-red-500">
+                            <XCircle className="h-4 w-4" />
+                            Rejected
+                            {payment.rejectionReason && (
+                              <span className="text-xs text-gray-400 ml-1">({payment.rejectionReason})</span>
+                            )}
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-2 text-yellow-500">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Pending
+                          </span>
                         )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          {payment.screenshotUrl && (
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              onClick={() => downloadScreenshot(payment.screenshotUrl!)}
+                              className="hover:bg-lightBlue/20"
+                              title="View Screenshot"
+                            >
+                              <Download className="h-4 w-4 text-lightBlue" />
+                            </Button>
+                          )}
+
+                          {payment.status === 'pending' && (
+                            <>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => handleVerify(payment)}
+                                className="hover:bg-green-500/20"
+                                title="Verify Payment"
+                              >
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                              </Button>
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() => setSelectedPayment(payment)}
+                                className="hover:bg-red-500/20"
+                                title="Reject Payment"
+                              >
+                                <XCircle className="h-4 w-4 text-red-500" />
+                              </Button>
+                            </>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
           </div>
@@ -201,4 +257,4 @@ export function PaymentManagement() {
       )}
     </div>
   )
-} 
+}

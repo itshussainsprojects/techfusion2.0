@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loader2, Calendar, MapPin, Users, Clock, Trophy, Info, User } from "lucide-react"
+import { Loader2, Calendar, MapPin, Users, Clock, Trophy, Info, User, Download } from "lucide-react"
 import ParticlesBackground from "@/components/particles-background"
 import type { ParticipantData } from "@/lib/firebase/firebase-provider"
 import PaymentSection from './components/payment-section'
+import { toast } from "sonner"
 
 // Contest details
 const contestDetails = {
@@ -170,6 +171,7 @@ export default function PortalPage() {
 
   const [participant, setParticipant] = useState<ParticipantData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const reloadParticipant = async () => {
     if (user?.email) {
@@ -378,7 +380,47 @@ export default function PortalPage() {
               </Tabs>
 
               <div className="mt-8 flex justify-center">
-                <Button className="bg-lightBlue hover:bg-lightBlue/80 text-white">Download Event Details</Button>
+                <Button
+                  className="bg-lightBlue hover:bg-lightBlue/80 text-white"
+                  disabled={isDownloading}
+                  onClick={() => {
+                    setIsDownloading(true);
+                    import('@/lib/utils/pdf-generator').then(module => {
+                      const { generateEventDetailsPDF } = module;
+                      try {
+                        generateEventDetailsPDF(
+                          participant.contest,
+                          contest,
+                          participant.name,
+                          participant.email,
+                          participant.rollNumber
+                        );
+                        toast.success('Event details downloaded successfully!');
+                      } catch (error) {
+                        console.error('Error generating PDF:', error);
+                        toast.error('Failed to download event details. Please try again.');
+                      } finally {
+                        setIsDownloading(false);
+                      }
+                    }).catch(error => {
+                      console.error('Error loading PDF generator:', error);
+                      toast.error('Failed to load PDF generator. Please try again.');
+                      setIsDownloading(false);
+                    });
+                  }}
+                >
+                  {isDownloading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Generating PDF...
+                    </>
+                  ) : (
+                    <>
+                      <Download className="mr-2 h-4 w-4" />
+                      Download Event Details
+                    </>
+                  )}
+                </Button>
               </div>
             </CardContent>
           </Card>
