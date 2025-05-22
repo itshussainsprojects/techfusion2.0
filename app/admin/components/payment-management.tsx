@@ -66,7 +66,7 @@ export function PaymentManagement() {
   const handleVerify = async (payment: PaymentData) => {
     try {
       await updatePaymentStatus(payment.id!, 'verified');
-      toast.success('Payment verified successfully. Participant status updated to PAID.');
+      toast.success(`Payment for ${payment.contestName.replace(/-/g, ' ')} verified successfully.`);
       loadData();
     } catch (error) {
       console.error('Error verifying payment:', error);
@@ -82,7 +82,7 @@ export function PaymentManagement() {
 
     try {
       await updatePaymentStatus(payment.id!, 'rejected', rejectionReason);
-      toast.success('Payment rejected. Participant status updated to NOT PAID.');
+      toast.success(`Payment for ${payment.contestName.replace(/-/g, ' ')} rejected.`);
       setSelectedPayment(null);
       setRejectionReason('');
       loadData();
@@ -141,7 +141,20 @@ export function PaymentManagement() {
                         </div>
                       </TableCell>
                       <TableCell className="text-white">{payment.userRollNumber}</TableCell>
-                      <TableCell className="text-white">{payment.contestName}</TableCell>
+                      <TableCell className="text-white">
+                        <div className="flex flex-col">
+                          <span>{payment.contestName.replace(/-/g, ' ')}</span>
+                          {participant && participant.contestsData && participant.contestsData[payment.contestName] && (
+                            <span className={`text-xs ${
+                              participant.contestsData[payment.contestName].paymentStatus === 'paid' ? 'text-green-500' :
+                              participant.contestsData[payment.contestName].paymentStatus === 'partial' ? 'text-yellow-500' :
+                              'text-red-500'
+                            }`}>
+                              Status: {participant.contestsData[payment.contestName].paymentStatus}
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell className="text-white">{payment.amount} PKR</TableCell>
                       <TableCell className="text-gray-300 text-sm">
                         {payment.timestamp ? new Date(payment.timestamp).toLocaleDateString() : 'N/A'}

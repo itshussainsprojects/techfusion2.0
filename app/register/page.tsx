@@ -25,7 +25,9 @@ export default function RegisterPage() {
     email: "",
     rollNumber: "",
     department: "",
-    contest: "",
+    contest: "", // Keep for backward compatibility
+    contests: [] as string[],
+    contestsData: {} as Record<string, any>
   })
 
   const [emailRegister, setEmailRegister] = useState({
@@ -88,11 +90,72 @@ export default function RegisterPage() {
     }))
   }
 
+  // Contest prices for calculating total
+  const CONTEST_PRICES = {
+    "robo-war": { amount: 10000, currency: "PKR", description: "Robo War Competition Fee" },
+    "e-sports": { amount: 1600, currency: "PKR", description: "E-Sports Tournament Fee" },
+    "ctf-cipher": { amount: 500, currency: "PKR", description: "CTF/Cipher Hack Competition Fee" },
+    "in-it-to-win-it": { amount: 500, currency: "PKR", description: "In It to Win It Activities Fee" },
+    "speed-coding-with-ai": { amount: 400, currency: "PKR", description: "Speed Coding with AI Competition Fee" },
+    "devathon": { amount: 400, currency: "PKR", description: "Devathon Registration Fee" },
+    "treasure-hunt": { amount: 1000, currency: "PKR", description: "Treasure Hunt Team Registration Fee" },
+    "60-second-video": { amount: 0, currency: "PKR", description: "60 Second Video Competition - Free" },
+    "eye-sight-camp": { amount: 0, currency: "PKR", description: "Eye Sight Camp - Free" },
+    "women-engineering-seminar": { amount: 0, currency: "PKR", description: "Women in Engineering Seminar - Free" },
+    "ai-seminar": { amount: 0, currency: "PKR", description: "AI Seminar - Free" },
+    "suffiyana": { amount: 700, currency: "PKR", description: "Suffiyana 2.0 - Cultural Event" },
+    "sham-e-sukhan": { amount: 700, currency: "PKR", description: "Sham-e-Sukhan - Cultural Event" },
+  };
+
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    if (name === "contest") {
+      // For backward compatibility
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+  }
+
+  const handleContestToggle = (contestName: string) => {
+    setFormData((prev) => {
+      // Ensure contests array exists
+      const currentContests = prev.contests || [];
+
+      // Check if contest is already selected
+      const isSelected = currentContests.includes(contestName);
+
+      // Create new contests array
+      const newContests = isSelected
+        ? currentContests.filter(c => c !== contestName)
+        : [...currentContests, contestName];
+
+      // Update contestsData
+      const newContestsData = { ...(prev.contestsData || {}) };
+
+      if (!isSelected) {
+        // Add contest data when selected
+        newContestsData[contestName] = {
+          contestName,
+          paymentStatus: 'not paid',
+          registrationDate: new Date()
+        };
+      } else {
+        // Remove contest data when deselected
+        delete newContestsData[contestName];
+      }
+
+      // Also update the single contest field for backward compatibility
+      // Use the first selected contest or empty string if none selected
+      const singleContest = newContests.length > 0 ? newContests[0] : "";
+
+      return {
+        ...prev,
+        contests: newContests,
+        contestsData: newContestsData,
+        contest: singleContest
+      };
+    });
   }
 
   // Update the handleSubmit function
@@ -100,12 +163,24 @@ export default function RegisterPage() {
     e.preventDefault()
 
     // Validate form
-    if (!formData.name || !formData.email || !formData.rollNumber || !formData.department || !formData.contest) {
+    if (!formData.name || !formData.email || !formData.rollNumber || !formData.department) {
       setFormState({
         isSubmitting: false,
         isSuccess: false,
         isError: true,
-        errorMessage: "Please fill in all fields",
+        errorMessage: "Please fill in all required fields",
+        alreadyRegistered: formState.alreadyRegistered,
+      })
+      return
+    }
+
+    // Validate contest selection
+    if (!formData.contests || formData.contests.length === 0) {
+      setFormState({
+        isSubmitting: false,
+        isSuccess: false,
+        isError: true,
+        errorMessage: "Please select at least one contest",
         alreadyRegistered: formState.alreadyRegistered,
       })
       return
@@ -137,6 +212,8 @@ export default function RegisterPage() {
         rollNumber: "",
         department: "",
         contest: "",
+        contests: [],
+        contestsData: {}
       })
 
       // Redirect to portal after successful registration
@@ -203,6 +280,8 @@ export default function RegisterPage() {
         rollNumber: "",
         department: "",
         contest: "",
+        contests: [],
+        contestsData: {}
       })
 
       setFormState({
@@ -504,26 +583,171 @@ export default function RegisterPage() {
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="contest" className="text-white">
-                      Contest
-                    </Label>
-                    <Select
-                      value={formData.contest}
-                      onValueChange={(value) => handleSelectChange("contest", value)}
-                      required
-                    >
-                      <SelectTrigger className="bg-darkBlue/50 border-gray-700 text-white">
-                        <SelectValue placeholder="Select a contest" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-darkBlue border-gray-700">
-                        <SelectItem value="hackathon">Hackathon</SelectItem>
-                        <SelectItem value="robotics">Robotics</SelectItem>
-                        <SelectItem value="gaming">Gaming</SelectItem>
-                        <SelectItem value="ai-challenge">AI Challenge</SelectItem>
-                        <SelectItem value="startup-pitch">Startup Pitch</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-4">
+                    <div>
+                      <Label className="text-white mb-2 block">
+                        Select Contests & Events (Choose one or more)
+                      </Label>
+
+                      {/* Competitions Section */}
+                      <div className="mb-4">
+                        <h4 className="text-lightBlue font-medium mb-2 text-sm uppercase tracking-wider">Competitions</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {Object.entries(CONTEST_PRICES)
+                            .filter(([contestId, details]) =>
+                              ['hackathon', 'robo-war', 'e-sports', 'ctf-cipher', 'in-it-to-win-it',
+                               'speed-coding-with-ai', 'devathon', 'treasure-hunt', '60-second-video'].includes(contestId))
+                            .map(([contestId, details]) => (
+                            <div
+                              key={contestId}
+                              className={`p-3 rounded-md border transition-colors ${
+                                formData.contests && formData.contests.includes(contestId)
+                                  ? 'bg-lightBlue/20 border-lightBlue'
+                                  : 'bg-darkBlue/50 border-gray-700 hover:border-gray-500'
+                              } ${
+                                ['ctf-cipher', 'e-sports'].includes(contestId)
+                                  ? 'opacity-60 cursor-not-allowed'
+                                  : 'cursor-pointer'
+                              }`}
+                              onClick={() => {
+                                if (!['ctf-cipher', 'e-sports'].includes(contestId)) {
+                                  handleContestToggle(contestId);
+                                }
+                              }}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <div className="font-medium text-white capitalize">
+                                    {contestId.replace(/-/g, ' ')}
+                                  </div>
+                                  <div className="text-sm text-gray-300">
+                                    {details.amount === 0 ? 'Free' : `${details.amount} ${details.currency}`}
+                                    {['ctf-cipher', 'e-sports'].includes(contestId) && (
+                                      <div className="text-amber-400 text-xs mt-1">
+                                        {contestId === 'ctf-cipher' ? 'Register at ciphers.cyberburgs.com' : 'Register via Google Form'}
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                                <div className={`h-5 w-5 rounded-full border ${
+                                  formData.contests && formData.contests.includes(contestId)
+                                    ? 'bg-lightBlue border-lightBlue flex items-center justify-center'
+                                    : 'border-gray-500'
+                                }`}>
+                                  {formData.contests && formData.contests.includes(contestId) && (
+                                    <CheckCircle2 className="h-4 w-4 text-white" />
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Seminars Section */}
+                      <div className="mb-4">
+                        <h4 className="text-lightBlue font-medium mb-2 text-sm uppercase tracking-wider">Seminars & Camps</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {Object.entries(CONTEST_PRICES)
+                            .filter(([contestId, details]) =>
+                              ['eye-sight-camp', 'women-engineering-seminar', 'ai-seminar'].includes(contestId))
+                            .map(([contestId, details]) => (
+                            <div
+                              key={contestId}
+                              className={`p-3 rounded-md border cursor-pointer transition-colors ${
+                                formData.contests && formData.contests.includes(contestId)
+                                  ? 'bg-lightBlue/20 border-lightBlue'
+                                  : 'bg-darkBlue/50 border-gray-700 hover:border-gray-500'
+                              }`}
+                              onClick={() => handleContestToggle(contestId)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <div className="font-medium text-white capitalize">
+                                    {contestId.replace(/-/g, ' ')}
+                                  </div>
+                                  <div className="text-sm text-green-400 font-medium">
+                                    Free
+                                  </div>
+                                </div>
+                                <div className={`h-5 w-5 rounded-full border ${
+                                  formData.contests && formData.contests.includes(contestId)
+                                    ? 'bg-lightBlue border-lightBlue flex items-center justify-center'
+                                    : 'border-gray-500'
+                                }`}>
+                                  {formData.contests && formData.contests.includes(contestId) && (
+                                    <CheckCircle2 className="h-4 w-4 text-white" />
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Cultural Events Section */}
+                      <div>
+                        <h4 className="text-lightBlue font-medium mb-2 text-sm uppercase tracking-wider">Cultural Events</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {Object.entries(CONTEST_PRICES)
+                            .filter(([contestId, details]) =>
+                              ['suffiyana', 'sham-e-sukhan'].includes(contestId))
+                            .map(([contestId, details]) => (
+                            <div
+                              key={contestId}
+                              className={`p-3 rounded-md border cursor-pointer transition-colors ${
+                                formData.contests && formData.contests.includes(contestId)
+                                  ? 'bg-lightBlue/20 border-lightBlue'
+                                  : 'bg-darkBlue/50 border-gray-700 hover:border-gray-500'
+                              }`}
+                              onClick={() => handleContestToggle(contestId)}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <div className="font-medium text-white capitalize">
+                                    {contestId.replace(/-/g, ' ')}
+                                  </div>
+                                  <div className="text-sm text-green-400 font-medium">
+                                    700 PKR
+                                  </div>
+                                </div>
+                                <div className={`h-5 w-5 rounded-full border ${
+                                  formData.contests && formData.contests.includes(contestId)
+                                    ? 'bg-lightBlue border-lightBlue flex items-center justify-center'
+                                    : 'border-gray-500'
+                                }`}>
+                                  {formData.contests && formData.contests.includes(contestId) && (
+                                    <CheckCircle2 className="h-4 w-4 text-white" />
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {formData.contests && formData.contests.length > 0 && (
+                      <div className="bg-darkBlue/50 border border-lightBlue/20 rounded-md p-4 mt-4">
+                        <h4 className="text-white font-medium mb-2">Selected Contests</h4>
+                        <ul className="space-y-2">
+                          {formData.contests.map(contestId => (
+                            <li key={contestId} className="flex justify-between text-gray-300">
+                              <span className="capitalize">{contestId.replace(/-/g, ' ')}</span>
+                              <span>{CONTEST_PRICES[contestId as keyof typeof CONTEST_PRICES].amount} PKR</span>
+                            </li>
+                          ))}
+                          <li className="flex justify-between text-white font-medium pt-2 border-t border-gray-700">
+                            <span>Total</span>
+                            <span>
+                              {formData.contests.reduce((total, contestId) =>
+                                total + CONTEST_PRICES[contestId as keyof typeof CONTEST_PRICES].amount, 0)
+                              } PKR
+                            </span>
+                          </li>
+                        </ul>
+                      </div>
+                    )}
                   </div>
 
                   <Button

@@ -74,13 +74,14 @@ import { useState, useEffect } from 'react'
 import { useFirebase } from '@/lib/firebase/firebase-provider'
 import { UserManagement } from './components/user-management'
 import { PaymentManagement } from './components/payment-management'
+import { QuestionManagement } from './components/question-management'
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ParticipantData } from '@/lib/firebase/firebase-provider' // Ensure correct import
 
 export default function AdminPage() {
   const { user, signOut, getParticipants, updateParticipant, deleteParticipant } = useFirebase()
-  const [activeTab, setActiveTab] = useState<'users' | 'payments'>('users') // Type for activeTab
+  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'questions'>('users') // Type for activeTab
   const [participants, setParticipants] = useState<ParticipantData[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -133,9 +134,10 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="users" className="mb-8">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-2">
+        <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
           <TabsTrigger value="users" onClick={() => setActiveTab('users')}>User Management</TabsTrigger>
           <TabsTrigger value="payments" onClick={() => setActiveTab('payments')}>Payment Management</TabsTrigger>
+          <TabsTrigger value="questions" onClick={() => setActiveTab('questions')}>Contest Questions</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="mt-6">
@@ -149,6 +151,10 @@ export default function AdminPage() {
 
         <TabsContent value="payments" className="mt-6">
           <PaymentManagement />
+        </TabsContent>
+
+        <TabsContent value="questions" className="mt-6">
+          <QuestionManagement isLoading={isLoading} />
         </TabsContent>
       </Tabs>
     </div>

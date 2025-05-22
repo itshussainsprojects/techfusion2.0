@@ -40,5 +40,44 @@ service cloud.firestore {
       allow update: if isAdmin();
       allow delete: if isAdmin();
     }
+
+    // Contest questions collection rules
+    match /questions/{questionId} {
+      // Admins can do everything
+      allow create, update, delete: if isAdmin();
+
+      // Admins can read all questions
+      // Regular users can only read active questions that are within the release time window
+      allow read: if isAdmin() ||
+        (request.auth != null &&
+         resource.data.isActive == true &&
+         resource.data.releaseTime <= request.time &&
+         resource.data.endTime >= request.time);
+    }
+
+    // Question submissions collection rules
+    match /submissions/{submissionId} {
+      // Admins can do everything
+      allow create, update, delete: if isAdmin();
+
+      // Users can create their own submissions
+      allow create: if request.auth != null &&
+                     request.resource.data.participantId != null;
+
+      // Users can read their own submissions, admins can read all
+      allow read: if isAdmin() ||
+                  (request.auth != null && (
+                    // Case 1: participantId is the user's email
+                    resource.data.participantId == request.auth.token.email ||
+
+                    // Case 2: participantId is the document ID of a participant with matching email
+                    (resource.data.participantId != null &&
+                     exists(/databases/$(database)/documents/participants/$(resource.data.participantId)) &&
+                     get(/databases/$(database)/documents/participants/$(resource.data.participantId)).data.email == request.auth.token.email) ||
+
+                    // Case 3: participantId is the user's UID
+                    resource.data.participantId == request.auth.uid
+                  ));
+    }
   }
 }

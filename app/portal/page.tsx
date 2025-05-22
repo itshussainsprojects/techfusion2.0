@@ -8,46 +8,23 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Loader2, Calendar, MapPin, Users, Clock, Trophy, Info, User, Download } from "lucide-react"
+import { Loader2, Calendar, MapPin, Users, Clock, Trophy, Info, User, Download, XCircle, Code } from "lucide-react"
 import ParticlesBackground from "@/components/particles-background"
 import type { ParticipantData } from "@/lib/firebase/firebase-provider"
 import PaymentSection from './components/payment-section'
+import { SimpleContestQuestions } from './components/simple-contest-questions'
 import { toast } from "sonner"
 
 // Contest details
 const contestDetails = {
-  hackathon: {
-    title: "Tech Fusion Hackathon",
-    description: "Build innovative solutions to real-world problems in 48 hours.",
-    date: "June 15-17, 2025",
-    location: "Main Campus, Building A",
-    teamSize: "2-4 members",
-    duration: "48 hours",
-    prizes: ["$5,000 First Prize", "$2,500 Second Prize", "$1,000 Third Prize"],
-    requirements: [
-      "Bring your own laptop and charger",
-      "Knowledge of web/mobile development",
-      "Presentation skills for demo",
-      "GitHub account",
-    ],
-    schedule: [
-      { time: "June 15, 9:00 AM", event: "Registration & Team Formation" },
-      { time: "June 15, 10:30 AM", event: "Opening Ceremony & Problem Statement" },
-      { time: "June 15, 12:00 PM", event: "Hacking Begins" },
-      { time: "June 16, 12:00 PM", event: "Mid-way Checkpoint" },
-      { time: "June 17, 12:00 PM", event: "Hacking Ends" },
-      { time: "June 17, 2:00 PM", event: "Presentations & Judging" },
-      { time: "June 17, 5:00 PM", event: "Awards Ceremony" },
-    ],
-  },
-  robotics: {
-    title: "Robotics Challenge",
-    description: "Design and program robots to navigate complex obstacles and complete tasks.",
-    date: "June 18-19, 2025",
+  "robo-war": {
+    title: "Robo War",
+    description: "A robot battle showcasing engineering and innovation.",
+    date: "June 27, 2023",
     location: "Engineering Building, Room 305",
     teamSize: "2-3 members",
     duration: "2 days",
-    prizes: ["$3,000 First Prize", "$1,500 Second Prize", "$750 Third Prize"],
+    prizes: ["25,000 PKR First Prize", "15,000 PKR Second Prize", "10,000 PKR Third Prize"],
     requirements: [
       "Basic knowledge of robotics",
       "Familiarity with Arduino or Raspberry Pi",
@@ -55,22 +32,22 @@ const contestDetails = {
       "Tools for assembly and testing",
     ],
     schedule: [
-      { time: "June 18, 9:00 AM", event: "Registration & Equipment Check" },
-      { time: "June 18, 10:00 AM", event: "Rules Briefing & Challenge Announcement" },
-      { time: "June 18, 11:00 AM", event: "Design & Build Phase Begins" },
-      { time: "June 19, 10:00 AM", event: "Testing Phase" },
-      { time: "June 19, 2:00 PM", event: "Final Competition" },
-      { time: "June 19, 5:00 PM", event: "Awards Ceremony" },
+      { time: "June 27, 9:00 AM", event: "Registration & Equipment Check" },
+      { time: "June 27, 10:00 AM", event: "Rules Briefing & Challenge Announcement" },
+      { time: "June 27, 11:00 AM", event: "Design & Build Phase Begins" },
+      { time: "June 28, 10:00 AM", event: "Testing Phase" },
+      { time: "June 28, 2:00 PM", event: "Final Competition" },
+      { time: "June 28, 5:00 PM", event: "Awards Ceremony" },
     ],
   },
-  gaming: {
-    title: "Gaming Tournament",
-    description: "Compete in popular esports titles and showcase your gaming skills.",
-    date: "June 20, 2025",
+  "e-sports": {
+    title: "E-Sports",
+    description: "Competitive video gaming in collaboration with Lavida.",
+    date: "June 27, 2023",
     location: "Student Center, Gaming Arena",
     teamSize: "Individual & Team Events",
     duration: "1 day",
-    prizes: ["$2,000 First Prize", "$1,000 Second Prize", "$500 Third Prize"],
+    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize"],
     requirements: [
       "Own gaming peripherals (optional)",
       "Registration for specific game titles",
@@ -78,90 +55,330 @@ const contestDetails = {
       "Discord account for communication",
     ],
     schedule: [
-      { time: "June 20, 8:00 AM", event: "Check-in & Setup" },
-      { time: "June 20, 9:00 AM", event: "Group Stage Matches Begin" },
-      { time: "June 20, 12:00 PM", event: "Lunch Break" },
-      { time: "June 20, 1:00 PM", event: "Quarterfinals" },
-      { time: "June 20, 3:00 PM", event: "Semifinals" },
-      { time: "June 20, 4:30 PM", event: "Finals" },
-      { time: "June 20, 6:00 PM", event: "Awards Ceremony" },
+      { time: "June 27, 8:00 AM", event: "Check-in & Setup" },
+      { time: "June 27, 9:00 AM", event: "Group Stage Matches Begin" },
+      { time: "June 27, 12:00 PM", event: "Lunch Break" },
+      { time: "June 27, 1:00 PM", event: "Quarterfinals" },
+      { time: "June 27, 3:00 PM", event: "Semifinals" },
+      { time: "June 27, 4:30 PM", event: "Finals" },
+      { time: "June 27, 6:00 PM", event: "Awards Ceremony" },
     ],
   },
-  "ai-challenge": {
-    title: "AI Innovation Challenge",
-    description: "Develop AI solutions to solve complex problems in healthcare, environment, or education.",
-    date: "June 21-22, 2025",
-    location: "Computer Science Building, AI Lab",
+  "ctf-cipher": {
+    title: "CTF / Cipher Hack",
+    description: "Cybersecurity competition testing ethical hacking skills in collaboration with Cyber Society.",
+    date: "June 27, 2023",
+    location: "Computer Science Building, Lab 201",
     teamSize: "1-3 members",
-    duration: "2 days",
-    prizes: ["$4,000 First Prize", "$2,000 Second Prize", "$1,000 Third Prize"],
+    duration: "1 day",
+    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize"],
     requirements: [
-      "Knowledge of machine learning frameworks",
-      "Data preprocessing skills",
-      "Python programming experience",
-      "Presentation of AI solution and results",
+      "Knowledge of cybersecurity basics",
+      "Familiarity with common hacking tools",
+      "Problem-solving skills",
+      "Laptop with necessary software",
     ],
     schedule: [
-      { time: "June 21, 9:00 AM", event: "Registration & Problem Statement" },
-      { time: "June 21, 10:00 AM", event: "Kickoff & Dataset Release" },
-      { time: "June 21, 11:00 AM", event: "Development Begins" },
-      { time: "June 22, 10:00 AM", event: "Progress Check-in" },
-      { time: "June 22, 3:00 PM", event: "Submission Deadline" },
-      { time: "June 22, 4:00 PM", event: "Presentations & Judging" },
-      { time: "June 22, 6:00 PM", event: "Awards Ceremony" },
+      { time: "June 27, 9:00 AM", event: "Registration & Team Setup" },
+      { time: "June 27, 10:00 AM", event: "Challenge Briefing" },
+      { time: "June 27, 10:30 AM", event: "Competition Begins" },
+      { time: "June 27, 3:30 PM", event: "Competition Ends" },
+      { time: "June 27, 4:00 PM", event: "Solution Review" },
+      { time: "June 27, 5:00 PM", event: "Awards Ceremony" },
     ],
   },
-  "startup-pitch": {
-    title: "Startup Pitch Competition",
-    description: "Present your innovative business ideas to investors and industry experts.",
-    date: "June 23, 2025",
-    location: "Business School Auditorium",
-    teamSize: "1-4 members",
+  "in-it-to-win-it": {
+    title: "In It to Win It",
+    description: "Fun on-ground interactive activities and games like human snake ladder, buzzer game, shoot the ball, treasure hunt.",
+    date: "June 27, 2023",
+    location: "University Grounds",
+    teamSize: "3-5 members",
     duration: "1 day",
-    prizes: ["$10,000 Seed Funding", "Mentorship Program", "Incubator Space"],
+    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize"],
     requirements: [
-      "Business plan document",
-      "Pitch deck (10 slides maximum)",
-      "5-minute presentation",
-      "Q&A readiness",
+      "Comfortable clothing and footwear",
+      "Team spirit and enthusiasm",
+      "Basic physical fitness",
+      "Willingness to participate in all activities",
     ],
     schedule: [
-      { time: "June 23, 9:00 AM", event: "Registration & Setup" },
-      { time: "June 23, 10:00 AM", event: "Opening Remarks" },
-      { time: "June 23, 10:30 AM", event: "Preliminary Round Pitches" },
-      { time: "June 23, 12:30 PM", event: "Networking Lunch" },
-      { time: "June 23, 2:00 PM", event: "Finalist Announcements" },
-      { time: "June 23, 3:00 PM", event: "Final Round Pitches" },
-      { time: "June 23, 5:00 PM", event: "Judges Deliberation & Awards" },
+      { time: "June 27, 9:00 AM", event: "Registration & Team Formation" },
+      { time: "June 27, 10:00 AM", event: "Games Briefing" },
+      { time: "June 27, 10:30 AM", event: "Activities Begin" },
+      { time: "June 27, 12:30 PM", event: "Lunch Break" },
+      { time: "June 27, 1:30 PM", event: "Activities Resume" },
+      { time: "June 27, 4:00 PM", event: "Final Challenge" },
+      { time: "June 27, 5:00 PM", event: "Awards Ceremony" },
+    ],
+  },
+  "speed-coding-with-ai": {
+    title: "Speed Coding with AI",
+    description: "Rapid problem-solving coding contest with AI tools.",
+    date: "June 27, 2023",
+    location: "Computer Science Lab, Room 201",
+    teamSize: "Individual",
+    duration: "4 hours",
+    prizes: ["3,000 PKR First Prize", "2,000 PKR Second Prize", "1,000 PKR Third Prize"],
+    requirements: [
+      "Laptop with internet connection",
+      "Knowledge of at least one programming language",
+      "Familiarity with AI coding assistants",
+      "GitHub account",
+    ],
+    schedule: [
+      { time: "June 27, 9:00 AM", event: "Check-in & Setup" },
+      { time: "June 27, 9:30 AM", event: "Competition Rules Briefing" },
+      { time: "June 27, 10:00 AM", event: "Coding Challenge Begins" },
+      { time: "June 27, 2:00 PM", event: "Coding Challenge Ends" },
+      { time: "June 27, 3:00 PM", event: "Solution Evaluation" },
+      { time: "June 27, 4:00 PM", event: "Results & Awards" },
+    ],
+  },
+  "devathon": {
+    title: "Devathon",
+    description: "A 24-hour development marathon to build innovative software solutions.",
+    date: "June 27, 2023",
+    location: "Engineering Building, Main Hall",
+    teamSize: "2-3 members",
+    duration: "24 hours",
+    prizes: ["10,000 PKR First Prize", "7,000 PKR Second Prize", "5,000 PKR Third Prize"],
+    requirements: [
+      "Laptop and necessary development tools",
+      "Software development experience",
+      "Team collaboration skills",
+      "Presentation materials for demo",
+    ],
+    schedule: [
+      { time: "June 27, 9:00 AM", event: "Registration & Team Setup" },
+      { time: "June 27, 10:00 AM", event: "Challenge Announcement" },
+      { time: "June 27, 10:30 AM", event: "Development Begins" },
+      { time: "June 28, 10:30 AM", event: "Development Ends" },
+      { time: "June 28, 11:00 AM", event: "Project Presentations" },
+      { time: "June 28, 1:00 PM", event: "Judging & Awards Ceremony" },
+    ],
+  },
+  "treasure-hunt": {
+    title: "Treasure Hunt",
+    description: "Team-based adventure to find hidden treasures across campus.",
+    date: "June 27, 2023",
+    location: "University Campus",
+    teamSize: "3-5 members",
+    duration: "6 hours",
+    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize"],
+    requirements: [
+      "Comfortable clothing and footwear",
+      "Smartphone with camera",
+      "Problem-solving skills",
+      "Team coordination",
+    ],
+    schedule: [
+      { time: "June 27, 9:00 AM", event: "Registration & Team Check-in" },
+      { time: "June 27, 9:30 AM", event: "Rules Briefing" },
+      { time: "June 27, 10:00 AM", event: "Hunt Begins" },
+      { time: "June 27, 1:00 PM", event: "Checkpoint & Lunch" },
+      { time: "June 27, 2:00 PM", event: "Hunt Continues" },
+      { time: "June 27, 4:00 PM", event: "Hunt Ends" },
+      { time: "June 27, 4:30 PM", event: "Results & Awards" },
+    ],
+  },
+  "60-second-video": {
+    title: "60 Second Video",
+    description: "Create short 60-second videos to cover and creatively highlight various aspects of the event.",
+    date: "June 27-29, 2025",
+    location: "University Campus",
+    teamSize: "1-2 members",
+    duration: "3 days",
+    prizes: ["Best Video Award", "Most Creative Award", "People's Choice Award"],
+    requirements: [
+      "Smartphone or camera for video recording",
+      "Basic video editing skills",
+      "Creativity and storytelling ability",
+      "Understanding of event themes",
+    ],
+    schedule: [
+      { time: "June 27, 9:00 AM", event: "Briefing & Theme Announcement" },
+      { time: "June 27-29", event: "Video Creation Period" },
+      { time: "June 29, 12:00 PM", event: "Submission Deadline" },
+      { time: "June 29, 3:00 PM", event: "Video Showcase" },
+      { time: "June 29, 4:00 PM", event: "Judging & Awards" },
+    ],
+  },
+  "suffiyana": {
+    title: "Suffiyana 2.0",
+    description: "Sufi musical performances and Qawalli featuring renowned artists - Rs. 700",
+    date: "June 28, 2023",
+    location: "Main Auditorium",
+    teamSize: "N/A",
+    duration: "3 hours",
+    prizes: ["Cultural Experience"],
+    requirements: [
+      "Registration fee: Rs. 700",
+      "Respect for cultural performances",
+      "Punctuality",
+    ],
+    schedule: [
+      { time: "June 28, 6:30 PM", event: "Doors Open" },
+      { time: "June 28, 7:00 PM", event: "Welcome Address" },
+      { time: "June 28, 7:15 PM", event: "First Performance" },
+      { time: "June 28, 8:30 PM", event: "Intermission" },
+      { time: "June 28, 8:45 PM", event: "Main Performance" },
+      { time: "June 28, 10:00 PM", event: "Closing" },
+    ],
+  },
+  "sham-e-sukhan": {
+    title: "Sham-e-Sukhan",
+    description: "A soulful evening of poetry featuring well-known poets - Rs. 700",
+    date: "June 29, 2023",
+    location: "Open Air Theater",
+    teamSize: "N/A",
+    duration: "3 hours",
+    prizes: ["Literary Experience"],
+    requirements: [
+      "Registration fee: Rs. 700",
+      "Appreciation for poetry",
+      "Punctuality",
+    ],
+    schedule: [
+      { time: "June 29, 6:30 PM", event: "Doors Open" },
+      { time: "June 29, 7:00 PM", event: "Introduction" },
+      { time: "June 29, 7:15 PM", event: "First Session" },
+      { time: "June 29, 8:30 PM", event: "Tea Break" },
+      { time: "June 29, 8:45 PM", event: "Second Session" },
+      { time: "June 29, 10:00 PM", event: "Closing Remarks" },
+    ],
+  },
+  "eye-sight-camp": {
+    title: "Eye Sight Camp",
+    description: "Free eyesight testing camp for students by Dr. Anum.",
+    date: "June 28, 2023",
+    location: "University Health Center",
+    teamSize: "N/A",
+    duration: "7 hours",
+    prizes: ["Free Eye Checkup"],
+    requirements: [
+      "University ID",
+      "Registration for time slot",
+    ],
+    schedule: [
+      { time: "June 28, 9:00 AM", event: "Camp Opens" },
+      { time: "June 28, 9:15 AM", event: "First Appointments" },
+      { time: "June 28, 12:30 PM", event: "Lunch Break" },
+      { time: "June 28, 1:30 PM", event: "Afternoon Appointments" },
+      { time: "June 28, 4:00 PM", event: "Camp Closes" },
+    ],
+  },
+  "women-engineering-seminar": {
+    title: "Women in Engineering Seminar",
+    description: "Inspiring session to highlight the role of women in tech and society.",
+    date: "June 26, 2023",
+    location: "Main Auditorium",
+    teamSize: "N/A",
+    duration: "3 hours",
+    prizes: ["Professional Development"],
+    requirements: [
+      "Registration for attendance",
+      "Notebook for taking notes (optional)",
+    ],
+    schedule: [
+      { time: "June 26, 9:30 AM", event: "Registration" },
+      { time: "June 26, 10:00 AM", event: "Welcome Address" },
+      { time: "June 26, 10:15 AM", event: "Keynote Speech" },
+      { time: "June 26, 11:00 AM", event: "Panel Discussion" },
+      { time: "June 26, 12:00 PM", event: "Q&A Session" },
+      { time: "June 26, 12:45 PM", event: "Closing Remarks" },
+      { time: "June 26, 1:00 PM", event: "Networking" },
+    ],
+  },
+  "ai-seminar": {
+    title: "Artificial Intelligence Seminar",
+    description: "Seminar on Artificial Intelligence and Robotics by Dr. Nosherwan Shoaib.",
+    date: "June 27, 2023",
+    location: "Computer Science Building, Room 201",
+    teamSize: "N/A",
+    duration: "3 hours",
+    prizes: ["Knowledge & Networking"],
+    requirements: [
+      "Registration for attendance",
+      "Basic understanding of AI concepts (recommended)",
+      "Notebook for taking notes (optional)",
+    ],
+    schedule: [
+      { time: "June 27, 1:30 PM", event: "Registration" },
+      { time: "June 27, 2:00 PM", event: "Introduction" },
+      { time: "June 27, 2:15 PM", event: "Keynote by Dr. Nosherwan Shoaib" },
+      { time: "June 27, 3:15 PM", event: "Break" },
+      { time: "June 27, 3:30 PM", event: "Interactive Session" },
+      { time: "June 27, 4:30 PM", event: "Q&A" },
+      { time: "June 27, 5:00 PM", event: "Closing & Networking" },
     ],
   },
 }
 
 const CONTEST_PRICES = {
-  hackathon: {
-    amount: 1000,
+  "robo-war": {
+    amount: 10000,
     currency: 'PKR',
-    description: 'Hackathon Registration Fee'
+    description: 'Robo War Competition Fee'
   },
-  robotics: {
-    amount: 800,
+  "e-sports": {
+    amount: 1600,
     currency: 'PKR',
-    description: 'Robotics Challenge Fee'
+    description: 'E-Sports Tournament Fee'
   },
-  gaming: {
+  "ctf-cipher": {
     amount: 500,
     currency: 'PKR',
-    description: 'Gaming Tournament Fee'
+    description: 'CTF/Cipher Hack Competition Fee'
   },
-  "ai-challenge": {
-    amount: 900,
+  "in-it-to-win-it": {
+    amount: 500,
     currency: 'PKR',
-    description: 'AI Challenge Registration Fee'
+    description: 'In It to Win It Activities Fee'
   },
-  "startup-pitch": {
+  "speed-coding-with-ai": {
+    amount: 400,
+    currency: 'PKR',
+    description: 'Speed Coding with AI Competition Fee'
+  },
+  "devathon": {
+    amount: 400,
+    currency: 'PKR',
+    description: 'Devathon Registration Fee'
+  },
+  "treasure-hunt": {
+    amount: 1000,
+    currency: 'PKR',
+    description: 'Treasure Hunt Team Registration Fee'
+  },
+  "60-second-video": {
+    amount: 0,
+    currency: 'PKR',
+    description: '60 Second Video Competition - Free'
+  },
+  "eye-sight-camp": {
+    amount: 0,
+    currency: 'PKR',
+    description: 'Eye Sight Camp - Free'
+  },
+  "women-engineering-seminar": {
+    amount: 0,
+    currency: 'PKR',
+    description: 'Women in Engineering Seminar - Free'
+  },
+  "ai-seminar": {
+    amount: 0,
+    currency: 'PKR',
+    description: 'AI Seminar - Free'
+  },
+  "suffiyana": {
     amount: 700,
     currency: 'PKR',
-    description: 'Startup Pitch Competition Fee'
+    description: 'Suffiyana 2.0 - Cultural Event'
+  },
+  "sham-e-sukhan": {
+    amount: 700,
+    currency: 'PKR',
+    description: 'Sham-e-Sukhan - Cultural Event'
   }
 }
 
@@ -172,19 +389,40 @@ export default function PortalPage() {
   const [participant, setParticipant] = useState<ParticipantData | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isDownloading, setIsDownloading] = useState(false)
+  const [selectedContest, setSelectedContest] = useState<string>("")
 
-  const reloadParticipant = async () => {
+  // Set initial selected contest when participant data changes
+  useEffect(() => {
+    if (participant) {
+      if (!selectedContest && participant.contests?.length > 0) {
+        setSelectedContest(participant.contests[0]);
+      } else if (!selectedContest && participant.contest) {
+        setSelectedContest(participant.contest);
+      }
+    }
+  }, [participant, selectedContest]);
+
+  const reloadParticipant = async (updatedParticipant?: ParticipantData) => {
+    // If an updated participant is provided, update the state immediately
+    if (updatedParticipant) {
+      console.log("Updating participant with local data:", updatedParticipant);
+      setParticipant(updatedParticipant);
+    }
+
+    // Then fetch the latest data from the server
     if (user?.email) {
       try {
-        const data = await getUserParticipation(user.email)
-        setParticipant(data)
+        console.log("Reloading participant data from server...");
+        const data = await getUserParticipation(user.email);
+        console.log("Reloaded participant data from server:", data);
+        setParticipant(data);
       } catch (error) {
-        console.error("Error fetching participant data:", error)
+        console.error("Error fetching participant data:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     } else {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -245,8 +483,102 @@ export default function PortalPage() {
     )
   }
 
-  // Get contest details based on participant's contest
-  const contest = contestDetails[participant.contest as keyof typeof contestDetails]
+  // Check if the participant's registration is pending approval
+  if (participant.approvalStatus === 'pending') {
+    return (
+      <div className="min-h-screen pt-20 pb-10 flex items-center justify-center bg-darkBlue">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-md mx-auto"
+          >
+            <Card className="glassmorphism border-lightBlue/20">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl font-bold text-center text-white">Registration Pending</CardTitle>
+                <CardDescription className="text-center text-gray-300">
+                  Your registration is awaiting admin approval.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 text-center">
+                <div className="flex justify-center mb-4">
+                  <Loader2 className="h-16 w-16 text-yellow-500 animate-spin" />
+                </div>
+                <p className="text-gray-300">
+                  Thank you for registering for Tech Fusion 2.0. Your registration is currently under review by our admin team.
+                </p>
+                <p className="text-gray-300">
+                  You'll receive full access to the participant portal once your registration is approved.
+                </p>
+                <p className="text-gray-300 text-sm mt-6">
+                  This usually takes 24-48 hours. If you have any questions, please contact us at support@techfusion.com
+                </p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </div>
+    )
+  }
+
+  // Check if the participant's registration was rejected
+  if (participant.approvalStatus === 'rejected') {
+    return (
+      <div className="min-h-screen pt-20 pb-10 flex items-center justify-center bg-darkBlue">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-md mx-auto"
+          >
+            <Card className="glassmorphism border-lightBlue/20">
+              <CardHeader className="space-y-1">
+                <CardTitle className="text-2xl font-bold text-center text-white">Registration Rejected</CardTitle>
+                <CardDescription className="text-center text-gray-300">
+                  We're sorry, but your registration was not approved.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4 text-center">
+                <div className="flex justify-center mb-4">
+                  <XCircle className="h-16 w-16 text-red-500" />
+                </div>
+
+                {participant.rejectionReason ? (
+                  <div className="bg-red-500/10 p-4 rounded-md border border-red-500/20 text-left mb-4">
+                    <h3 className="text-white font-medium mb-2">Reason for rejection:</h3>
+                    <p className="text-gray-300">{participant.rejectionReason}</p>
+                  </div>
+                ) : (
+                  <p className="text-gray-300">
+                    Your registration could not be approved at this time.
+                  </p>
+                )}
+
+                <p className="text-gray-300 text-sm mt-6">
+                  If you believe this is an error or would like to submit a new registration, please contact us at support@techfusion.com
+                </p>
+
+                <Button
+                  onClick={() => router.push("/register")}
+                  className="bg-lightBlue hover:bg-lightBlue/80 text-white mt-4"
+                >
+                  Register Again
+                </Button>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      </div>
+    )
+  }
+
+  // Get contest details based on selected contest or fallback to first available contest
+  const contestToUse = selectedContest ||
+    (participant.contests && participant.contests.length > 0 ? participant.contests[0] : participant.contest);
+
+  const contest = contestDetails[contestToUse as keyof typeof contestDetails];
 
   return (
     <div className="min-h-screen pt-20 pb-10 bg-darkBlue">
@@ -261,9 +593,25 @@ export default function PortalPage() {
                   <CardTitle className="text-2xl md:text-3xl font-bold text-white">Participant Portal</CardTitle>
                   <CardDescription className="text-gray-300">Welcome back, {participant.name}</CardDescription>
                 </div>
-                <Badge className="bg-lightBlue text-white text-sm px-3 py-1">
-                  {participant.contest.charAt(0).toUpperCase() + participant.contest.slice(1).replace("-", " ")}
-                </Badge>
+                <div className="flex flex-wrap gap-2 justify-end">
+                  {participant.contests && participant.contests.length > 0 ? (
+                    participant.contests.map(contestId => (
+                      <Badge
+                        key={contestId}
+                        className={`text-white text-sm px-3 py-1 cursor-pointer ${
+                          selectedContest === contestId ? 'bg-lightBlue' : 'bg-gray-700 hover:bg-gray-600'
+                        }`}
+                        onClick={() => setSelectedContest(contestId)}
+                      >
+                        {contestId.charAt(0).toUpperCase() + contestId.slice(1).replace(/-/g, " ")}
+                      </Badge>
+                    ))
+                  ) : participant.contest ? (
+                    <Badge className="bg-lightBlue text-white text-sm px-3 py-1">
+                      {participant.contest.charAt(0).toUpperCase() + participant.contest.slice(1).replace(/-/g, " ")}
+                    </Badge>
+                  ) : null}
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -291,7 +639,7 @@ export default function PortalPage() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="details" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 bg-darkBlue/50">
+                <TabsList className="grid w-full grid-cols-4 bg-darkBlue/50">
                   <TabsTrigger value="details" className="text-white">
                     Details
                   </TabsTrigger>
@@ -301,6 +649,12 @@ export default function PortalPage() {
                   <TabsTrigger value="schedule" className="text-white">
                     Schedule
                   </TabsTrigger>
+                  {(contestToUse === 'speed-coding-with-ai' || contestToUse === 'devathon') && (
+                    <TabsTrigger value="questions" className="text-white">
+                      <Code className="h-4 w-4 mr-2" />
+                      Questions
+                    </TabsTrigger>
+                  )}
                 </TabsList>
 
                 <TabsContent value="details" className="space-y-4 mt-4">
@@ -377,6 +731,15 @@ export default function PortalPage() {
                     </div>
                   </div>
                 </TabsContent>
+
+                {(contestToUse === 'speed-coding-with-ai' || contestToUse === 'devathon') && (
+                  <TabsContent value="questions" className="mt-4">
+                    <SimpleContestQuestions
+                      contestType={contestToUse as 'speed-coding-with-ai' | 'devathon'}
+                      participant={participant}
+                    />
+                  </TabsContent>
+                )}
               </Tabs>
 
               <div className="mt-8 flex justify-center">
@@ -388,9 +751,13 @@ export default function PortalPage() {
                     import('@/lib/utils/pdf-generator').then(module => {
                       const { generateEventDetailsPDF } = module;
                       try {
+                        // Get the contest details for the selected contest
+                        const contestId = contestToUse || "speed-coding-with-ai"; // Fallback to speed-coding-with-ai if no contest is selected
+                        const contestDetailsForPdf = contestDetails[contestId as keyof typeof contestDetails];
+
                         generateEventDetailsPDF(
-                          participant.contest,
-                          contest,
+                          contestId,
+                          contestDetailsForPdf,
                           participant.name,
                           participant.email,
                           participant.rollNumber
@@ -429,7 +796,17 @@ export default function PortalPage() {
         <PaymentSection
           participant={participant}
           reloadParticipant={reloadParticipant}
-          paymentDetails={CONTEST_PRICES[participant.contest as keyof typeof CONTEST_PRICES]}
+          selectedContest={selectedContest}
+          paymentDetails={
+            // Check if the contest exists in CONTEST_PRICES, otherwise use a default
+            CONTEST_PRICES[
+              (selectedContest || participant.contest || participant.contests?.[0] || "speed-coding-with-ai") as keyof typeof CONTEST_PRICES
+            ] || {
+              amount: 1000,
+              currency: 'PKR',
+              description: 'Registration Fee'
+            }
+          }
         />
       </div>
     </div>

@@ -6,7 +6,7 @@ const faqs = [
   {
     question: "When and where is Tech Fusion 2.0 taking place?",
     answer:
-      "Tech Fusion 2.0 will take place from August 1-4, 2025, at the University Campus. The event will be spread across multiple venues throughout the campus.",
+      "Tech Fusion 2.0 will take place from May 27-29, 2025, and the closing ceremony will be held on May 29, 2025, at the University Campus. The event will be spread across multiple venues throughout the campus.",
   },
   {
     question: "How can I register for the event?",
@@ -16,12 +16,12 @@ const faqs = [
   {
     question: "Is there a registration fee?",
     answer:
-      "Registration for Tech Fusion 2.0 is completely free for all university students. External participants may have a nominal fee which will be communicated during registration.",
+      "Registration for Tech Fusion 2.0 is completely for all university students. External participants may are encouraged to apply",
   },
   {
     question: "Can I participate in multiple contests?",
     answer:
-      "Due to scheduling constraints, participants can only register for one main contest. However, there will be several mini-events and workshops that all attendees can participate in regardless of their main contest.",
+      "Yes you can participate in multiple contests. However, you can only register for one main contest. You can participate in all the events and workshops regardless of your main contest.",
   },
   {
     question: "What should I bring to the event?",
@@ -31,7 +31,7 @@ const faqs = [
   {
     question: "Are there prizes for the winners?",
     answer:
-      "Yes! Tech Fusion 2.0 has a total prize pool of $10,000 distributed across all contests. Winners will also receive certificates, internship opportunities, and tech gadgets from our sponsors.",
+      "Yes! Tech Fusion 2.0 has a total prize pool of Rs90,000 distributed across all contests. Winners will also receive certificates, internship opportunities, and tech gadgets from our sponsors.",
   },
   {
     question: "Can I volunteer for the event?",

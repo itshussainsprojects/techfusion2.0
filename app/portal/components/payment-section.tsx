@@ -9,28 +9,49 @@ import { toast } from 'sonner'
 
 interface PaymentSectionProps {
   participant: any // ParticipantData
-  reloadParticipant: () => void
+  reloadParticipant: (updatedParticipant?: any) => void
   paymentDetails: {
     amount: number
     currency: string
     description: string
   }
+  selectedContest?: string // Add selected contest prop
 }
 
-const WHATSAPP_NUMBER = '923001234567' // sample Pakistani number
+const WHATSAPP_NUMBER = '923319215005' // Updated WhatsApp number
 
-export default function PaymentSection({ participant, reloadParticipant, paymentDetails }: PaymentSectionProps) {
+export default function PaymentSection({ participant, reloadParticipant, paymentDetails, selectedContest }: PaymentSectionProps) {
   const { user, updateParticipant, createPaymentRecord, getPaymentsByParticipantId } = useFirebase()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string>('')
   const [paymentHistory, setPaymentHistory] = useState<any[]>([])
 
-  // Load payment history when component mounts
+  // Create a safe version of paymentDetails with fallback values
+  const safePaymentDetails = paymentDetails || {
+    amount: 1000,
+    currency: 'PKR',
+    description: 'Registration Fee'
+  }
+
+  // Load payment history when component mounts or selected contest changes
   useEffect(() => {
     if (participant?.id) {
       loadPaymentHistory();
     }
-  }, [participant?.id]);
+  }, [participant?.id, selectedContest]);
+
+  // Get the contest to display - either the selected one or the first one
+  const contestToDisplay = selectedContest ||
+    (participant.contests && participant.contests.length > 0 ? participant.contests[0] : participant.contest);
+
+  // Debug participant data changes
+  useEffect(() => {
+    if (participant) {
+      console.log("Participant data updated:", participant);
+      console.log("Current contest data:",
+        contestToDisplay ? participant.contestsData?.[contestToDisplay] : "No contest selected");
+    }
+  }, [participant, contestToDisplay]);
 
   const loadPaymentHistory = async () => {
     try {
@@ -38,6 +59,7 @@ export default function PaymentSection({ participant, reloadParticipant, payment
         const payments = await getPaymentsByParticipantId(participant.id);
         if (Array.isArray(payments)) {
           setPaymentHistory(payments);
+          console.log("Loaded payment history:", payments);
         } else {
           console.warn("Payments data is not an array:", payments);
           setPaymentHistory([]);
@@ -56,6 +78,16 @@ export default function PaymentSection({ participant, reloadParticipant, payment
       toast.error('You must be logged in to mark as paid.')
       return
     }
+
+    // Use the selected contest or the first contest in the list
+    const contestName = selectedContest || participant.contest;
+
+    if (!contestName) {
+      setError('No contest selected.')
+      toast.error('No contest selected. Please select a contest first.')
+      return
+    }
+
     setIsSubmitting(true)
     try {
       // 1. First create a payment record
@@ -65,42 +97,97 @@ export default function PaymentSection({ participant, reloadParticipant, payment
           userName: participant.name,
           userRollNumber: participant.rollNumber,
           participantId: participant.id,
-          contestName: participant.contest,
-          amount: paymentDetails.amount,
+          contestName: contestName,
+          amount: safePaymentDetails.amount,
           paymentMethod: 'WhatsApp', // Default method
           status: 'pending'
         });
-        console.log("Payment record created successfully");
-      } catch (paymentError) {
+        console.log("Payment record created successfully for contest:", contestName);
+      } catch (error) {
+        const paymentError = error as Error;
         console.error("Error creating payment record:", paymentError);
         // Continue with the process even if payment record creation fails
       }
 
-      // 2. Update participant status to partial
+      // 2. Update participant status
       try {
-        await updateParticipant(participant.id, {
+        // Create updated contestsData with the current contest marked as partial
+        const updatedContestsData = { ...participant.contestsData || {} };
+
+        // Ensure the contest data exists
+        if (!updatedContestsData[contestName]) {
+          updatedContestsData[contestName] = {
+            contestName,
+            registrationDate: new Date()
+          };
+        }
+
+        // Update the payment status for this contest
+        updatedContestsData[contestName] = {
+          ...updatedContestsData[contestName],
+          contestName,
           paymentStatus: 'partial',
+        };
+
+        console.log("Updating contest data:", updatedContestsData);
+
+        // Update the participant record
+        await updateParticipant(participant.id, {
+          contestsData: updatedContestsData,
+          // Only update overall status if not already paid
+          ...(participant.paymentStatus !== 'paid' && { paymentStatus: 'partial' })
         });
-        console.log("Participant status updated to partial");
-      } catch (participantError) {
+
+        console.log("Contest payment status updated to partial for:", contestName);
+      } catch (error) {
+        const participantError = error as Error;
         console.error("Error updating participant status:", participantError);
-        setError('Failed to update payment status: ' + (participantError?.message || 'Unknown error'));
+        setError('Failed to update payment status: ' + (participantError.message || 'Unknown error'));
         toast.error('Failed to update payment status. Please try again or contact support.');
         setIsSubmitting(false);
         return;
       }
 
-      // 3. Reload data
+      // 3. Reload data and update local state immediately
       await loadPaymentHistory();
-      toast.success('Marked as under verification! Please send your payment screenshot on WhatsApp.')
-      reloadParticipant()
 
-      // 4. Open WhatsApp with pre-filled message
-      const message = encodeURIComponent(`Hello, I have made a payment for the contest (${participant.contest}) for ${paymentDetails.amount} ${paymentDetails.currency}. My name is ${participant.name}, email: ${participant.email}, roll number: ${participant.rollNumber}. Here is my payment screenshot.`)
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank')
-    } catch (err: any) {
-      setError('Failed to mark as paid: ' + (err?.message || 'Unknown error'))
-      toast.error('Failed to mark as paid: ' + (err?.message || 'Unknown error'))
+      // Update local state to show partial status immediately without waiting for reload
+      const updatedParticipant = { ...participant };
+      if (!updatedParticipant.contestsData) {
+        updatedParticipant.contestsData = {};
+      }
+
+      if (!updatedParticipant.contestsData[contestName]) {
+        updatedParticipant.contestsData[contestName] = {
+          contestName,
+          registrationDate: new Date()
+        };
+      }
+
+      updatedParticipant.contestsData[contestName].paymentStatus = 'partial';
+
+      // Only update overall status if not already paid
+      if (updatedParticipant.paymentStatus !== 'paid') {
+        updatedParticipant.paymentStatus = 'partial';
+      }
+
+      // Update the participant prop with the updated data
+      reloadParticipant(updatedParticipant);
+
+      // Show success message
+      toast.success(`Marked ${contestName.replace(/-/g, ' ')} as under verification! Click the button below to send your payment screenshot on WhatsApp.`);
+
+      // Don't automatically open WhatsApp here, let the user click the button in the partial payment section
+      // This ensures they can see the updated status before leaving the page
+
+      // Reload participant data from server after a short delay
+      setTimeout(() => {
+        reloadParticipant();
+      }, 1000);
+    } catch (error) {
+      const err = error as Error;
+      setError('Failed to mark as paid: ' + (err.message || 'Unknown error'))
+      toast.error('Failed to mark as paid: ' + (err.message || 'Unknown error'))
       console.error('Error marking as paid:', err)
     } finally {
       setIsSubmitting(false)
@@ -121,16 +208,33 @@ export default function PaymentSection({ participant, reloadParticipant, payment
     )
   }
 
-  if (participant.paymentStatus === 'paid') {
-    // Find the verified payment if it exists
-    const verifiedPayment = paymentHistory.find(p => p.status === 'verified');
+  // We already defined contestToDisplay at the top of the component
 
+  // Get the payment status for the specific contest
+  const contestPaymentStatus = contestToDisplay && participant.contestsData && participant.contestsData[contestToDisplay]
+    ? participant.contestsData[contestToDisplay].paymentStatus
+    : participant.paymentStatus;
+
+  // Find the payment records for this contest
+  const contestPayments = paymentHistory.filter(p => p.contestName === contestToDisplay);
+
+  // Find the verified payment for this contest if it exists
+  const verifiedPayment = contestPayments.find(p => p.status === 'verified');
+
+  // Find the pending payment for this contest if it exists
+  const pendingPayment = contestPayments.find(p => p.status === 'pending');
+
+  console.log("Contest to display:", contestToDisplay);
+  console.log("Contest payment status:", contestPaymentStatus);
+  console.log("Contest payments:", contestPayments);
+
+  if (contestPaymentStatus === 'paid') {
     return (
       <Card className="glassmorphism border-lightBlue/20 mt-6">
         <CardHeader>
           <CardTitle className="text-xl md:text-2xl font-bold text-white">Payment Status</CardTitle>
           <CardDescription className="text-gray-300">
-            {paymentDetails.description}: {paymentDetails.amount} {paymentDetails.currency}
+            {safePaymentDetails.description}: {safePaymentDetails.amount} {safePaymentDetails.currency}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -143,8 +247,8 @@ export default function PaymentSection({ participant, reloadParticipant, payment
             <div className="bg-darkBlue/30 p-4 rounded-md border border-green-500/20">
               <h3 className="text-white font-medium mb-2">Payment Details:</h3>
               <div className="text-gray-300 space-y-1">
-                <p><span className="text-gray-400">Amount:</span> {paymentDetails.amount} {paymentDetails.currency}</p>
-                <p><span className="text-gray-400">Contest:</span> {participant.contest}</p>
+                <p><span className="text-gray-400">Amount:</span> {safePaymentDetails.amount} {safePaymentDetails.currency}</p>
+                <p><span className="text-gray-400">Contest:</span> {contestToDisplay.replace(/-/g, ' ')}</p>
                 {verifiedPayment && verifiedPayment.timestamp && (
                   <p><span className="text-gray-400">Verified on:</span> {new Date(verifiedPayment.timestamp).toLocaleString()}</p>
                 )}
@@ -153,7 +257,7 @@ export default function PaymentSection({ participant, reloadParticipant, payment
             </div>
 
             <div className="bg-green-500/10 p-3 rounded-md border border-green-500/20 text-center">
-              <p className="text-green-400">You're all set! Your registration is confirmed.</p>
+              <p className="text-green-400">You're all set! Your registration for this contest is confirmed.</p>
             </div>
           </div>
         </CardContent>
@@ -161,20 +265,32 @@ export default function PaymentSection({ participant, reloadParticipant, payment
     )
   }
 
-  if (participant.paymentStatus === 'partial') {
+  if (contestPaymentStatus === 'partial') {
     return (
       <Card className="glassmorphism border-lightBlue/20 mt-6">
         <CardHeader>
           <CardTitle className="text-xl md:text-2xl font-bold text-white">Payment Status</CardTitle>
           <CardDescription className="text-gray-300">
-            {paymentDetails.description}: {paymentDetails.amount} {paymentDetails.currency}
+            {safePaymentDetails.description}: {safePaymentDetails.amount} {safePaymentDetails.currency}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-yellow-500 mb-2">
               <Loader2 className="h-5 w-5 animate-spin" />
-              <span>Payment is under verification. Admin will verify your payment soon.</span>
+              <span>Payment for {contestToDisplay.replace(/-/g, ' ')} is under verification. Admin will verify your payment soon.</span>
+            </div>
+
+            <div className="bg-darkBlue/30 p-4 rounded-md border border-yellow-500/20">
+              <h3 className="text-white font-medium mb-2">Payment Details:</h3>
+              <div className="text-gray-300 space-y-1">
+                <p><span className="text-gray-400">Amount:</span> {safePaymentDetails.amount} {safePaymentDetails.currency}</p>
+                <p><span className="text-gray-400">Contest:</span> {contestToDisplay.replace(/-/g, ' ')}</p>
+                {pendingPayment && pendingPayment.timestamp && (
+                  <p><span className="text-gray-400">Submitted on:</span> {new Date(pendingPayment.timestamp).toLocaleString()}</p>
+                )}
+                <p><span className="text-gray-400">Status:</span> <span className="text-yellow-500">Under Verification</span></p>
+              </div>
             </div>
 
             <div className="bg-darkBlue/30 p-4 rounded-md border border-yellow-500/20">
@@ -189,10 +305,10 @@ export default function PaymentSection({ participant, reloadParticipant, payment
 
             <Button
               onClick={() => {
-                const message = encodeURIComponent(`Hello, I'm following up on my payment for the contest (${participant.contest}) for ${paymentDetails.amount} ${paymentDetails.currency}. My name is ${participant.name}, email: ${participant.email}, roll number: ${participant.rollNumber}. Here is my payment screenshot.`)
+                const message = encodeURIComponent(`Hello, I'm following up on my payment for the contest (${contestToDisplay.replace(/-/g, ' ')}) for ${safePaymentDetails.amount} ${safePaymentDetails.currency}. My name is ${participant.name}, email: ${participant.email}, roll number: ${participant.rollNumber}. Here is my payment screenshot.`)
                 window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank')
               }}
-              className="bg-yellow-600 hover:bg-yellow-700 text-white"
+              className="bg-yellow-600 hover:bg-yellow-700 text-white w-full py-6 text-sm sm:text-base"
             >
               Send Screenshot on WhatsApp
             </Button>
@@ -207,17 +323,44 @@ export default function PaymentSection({ participant, reloadParticipant, payment
       <CardHeader>
         <CardTitle className="text-xl md:text-2xl font-bold text-white">Payment Details</CardTitle>
         <CardDescription className="text-gray-300">
-        <span>JazzCash: 0300-1234567 - Easypaisa: 0300-1234567</span>
+        <span>JazzCash: +92 3319215005 - Easypaisa: +92 3319215005</span>
         <br></br>
-          {paymentDetails.description}: {paymentDetails.amount} {paymentDetails.currency}
+          {safePaymentDetails.description}: {safePaymentDetails.amount} {safePaymentDetails.currency}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
+          {/* Show contest selection if multiple contests are registered */}
+          {participant.contests && participant.contests.length > 1 && !selectedContest && (
+            <div className="bg-darkBlue/30 p-4 rounded-md border border-lightBlue/20 mb-4">
+              <h3 className="text-white font-medium mb-2">You are registered for multiple contests:</h3>
+              <p className="text-gray-300 text-sm mb-3">Please make payment for each contest separately.</p>
+              <div className="grid grid-cols-1 gap-2">
+                {participant.contests.map((contestId: string) => {
+                  const status = participant.contestsData[contestId]?.paymentStatus || 'not paid';
+                  return (
+                    <div key={contestId} className="flex justify-between items-center p-2 rounded border border-gray-700">
+                      <span className="text-white capitalize">{contestId.replace(/-/g, ' ')}</span>
+                      <span className={`text-sm ${
+                        status === 'paid' ? 'text-green-500' :
+                        status === 'partial' ? 'text-yellow-500' :
+                        'text-red-500'
+                      }`}>
+                        {status === 'paid' ? 'Paid' :
+                         status === 'partial' ? 'Under Verification' :
+                         'Not Paid'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           <Button
             onClick={handleMarkPaid}
             disabled={isSubmitting}
-            className="bg-lightBlue hover:bg-lightBlue/80 text-white w-full"
+            className="bg-lightBlue hover:bg-lightBlue/80 text-white w-full py-6 text-sm sm:text-base"
           >
             {isSubmitting ? (
               <>
@@ -225,7 +368,11 @@ export default function PaymentSection({ participant, reloadParticipant, payment
                 Submitting...
               </>
             ) : (
-              <>Mark as Paid &amp; Send Screenshot on WhatsApp</>
+              <div className="flex flex-col sm:flex-row items-center justify-center">
+                <span className="whitespace-normal text-center">
+                  Mark {contestToDisplay ? contestToDisplay.replace(/-/g, ' ') : 'Contest'} as Paid
+                </span>
+              </div>
             )}
           </Button>
         </div>

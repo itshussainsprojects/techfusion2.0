@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { motion } from "framer-motion"
 import { Menu, X, User, LogOut, Shield, ChevronDown } from "lucide-react"
 import { useFirebase } from "@/lib/firebase/firebase-provider"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -71,11 +72,15 @@ const Navbar = () => {
         scrolled ? "bg-darkBlue/80 backdrop-blur-md shadow-lg" : "bg-transparent"
       }`}
     >
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4 py-3 sm:py-4">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-2">
-            <motion.div whileHover={{ scale: 1.05 }} className="text-2xl font-bold text-white">
-              <span className="gradient-text">Tech Fusion 2.0</span>
+          <Link href="/" className="flex items-center space-x-3">
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <img
+                src="/images/techfusion-logo.png"
+                alt="Tech Fusion Logo"
+                className="h-12 sm:h-14 w-auto"
+              />
             </motion.div>
           </Link>
 

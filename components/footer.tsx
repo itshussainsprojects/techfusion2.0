@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { Instagram, Facebook, Twitter, Linkedin, Mail } from "lucide-react"
+import { Mail } from "lucide-react"
+import { FaInstagram, FaFacebook, FaTwitter, FaLinkedin } from "react-icons/fa"
 
 const Footer = () => {
   const currentYear = new Date().getFullYear()
@@ -12,14 +13,18 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <motion.h3
+            <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.1 }}
-              className="text-xl font-bold mb-4 gradient-text"
+              className="mb-4"
             >
-              Tech Fusion 2.0
-            </motion.h3>
+              <img
+                src="/images/techfusion-logo.png"
+                alt="Tech Fusion Logo"
+                className="h-16 sm:h-20 w-auto"
+              />
+            </motion.div>
             <motion.p
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
@@ -36,16 +41,16 @@ const Footer = () => {
               className="flex space-x-4"
             >
               <Link href="https://instagram.com" target="_blank" rel="noopener noreferrer">
-                <Instagram className="h-5 w-5 text-gray-300 hover:text-lightBlue transition-colors" />
+                <FaInstagram className="h-5 w-5 text-gray-300 hover:text-lightBlue transition-colors" />
               </Link>
               <Link href="https://facebook.com" target="_blank" rel="noopener noreferrer">
-                <Facebook className="h-5 w-5 text-gray-300 hover:text-lightBlue transition-colors" />
+                <FaFacebook className="h-5 w-5 text-gray-300 hover:text-lightBlue transition-colors" />
               </Link>
               <Link href="https://twitter.com" target="_blank" rel="noopener noreferrer">
-                <Twitter className="h-5 w-5 text-gray-300 hover:text-lightBlue transition-colors" />
+                <FaTwitter className="h-5 w-5 text-gray-300 hover:text-lightBlue transition-colors" />
               </Link>
               <Link href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                <Linkedin className="h-5 w-5 text-gray-300 hover:text-lightBlue transition-colors" />
+                <FaLinkedin className="h-5 w-5 text-gray-300 hover:text-lightBlue transition-colors" />
               </Link>
             </motion.div>
           </div>
@@ -112,9 +117,9 @@ const Footer = () => {
               <p className="text-gray-300">
                 IEEE SSCIT Student Branch,
                 <br />
-                University Campus,
+                Street 33, Block A
                 <br />
-                Technology Avenue
+               Multi Gardens B-17, Islamabad
               </p>
             </motion.div>
           </div>
