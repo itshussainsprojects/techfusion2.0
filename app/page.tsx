@@ -125,7 +125,7 @@ export default function Home() {
       description: "Official kickoff of Tech Fusion 2.0 with keynote speakers at 9:00 AM",
     },
     {
-      date: `${currentMonth} 27-28, ${currentYear}`,
+      date: `${currentMonth} 27-29, ${currentYear}`,
       title: "Contest Days",
       description: "All contests run simultaneously across campus venues",
     },
@@ -324,7 +324,7 @@ export default function Home() {
                 <MapPin className="h-8 w-8 text-lightBlue" />
               </div>
               <h3 className="text-xl font-bold text-center mb-4">University Campus</h3>
-              <p className="text-gray-300 text-center">Hosted across multiple venues throughout the university campus, including the Main Auditorium and Computer Science Building.</p>
+              <p className="text-gray-300 text-center">Hosted across multiple venues throughout the university campus, including the CS Labs and Computer Science Building.</p>
             </motion.div>
 
             <motion.div
@@ -447,7 +447,7 @@ export default function Home() {
       <EventsSection />
 
       {/* Timeline Section */}
-      <section id="timeline" className="py-20 bg-gradient-to-b from-darkBlue/80 to-darkBlue/70">
+      <section id="timeline" className="py-20 bg-gradient-to-b from-darkBlue/80 to-darkBlue/70 overflow-hidden">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -457,53 +457,195 @@ export default function Home() {
             className="text-center mb-16"
           >
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Event Timeline</h2>
-            <div className="w-20 h-1 bg-lightBlue mx-auto mb-6"></div>
+            <div className="w-20 h-1 bg-gradient-to-r from-blue-500 to-lightBlue mx-auto mb-6"></div>
             <p className="text-lg text-gray-300 max-w-3xl mx-auto">
               Mark your calendar for these important dates and events.
             </p>
           </motion.div>
 
           <div className="relative">
-            {/* Timeline Line */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-lightBlue/30 hidden md:block"></div>
+            {/* Timeline Progress Line */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-gray-700 hidden md:block">
+              <motion.div
+                className="absolute top-0 left-0 w-full bg-lightBlue animate-timeline-glow"
+                initial={{ height: "0%" }}
+                whileInView={{ height: "100%" }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                viewport={{ once: true }}
+              />
+            </div>
 
-            {/* Timeline Events */}
-            <div className="space-y-12 relative">
-              {timelineEvents.map((event, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  viewport={{ once: true }}
-                  className={`flex flex-col md:flex-row items-center ${
-                    index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
-                  }`}
-                >
-                  <div className="md:w-1/2 mb-4 md:mb-0 flex justify-center md:justify-end md:pr-8">
-                    <div
-                      className={`glassmorphism p-6 rounded-lg max-w-md ${
-                        index % 2 === 0 ? "md:text-right" : "md:text-left md:ml-8"
-                      }`}
+            {/* Mobile Timeline - Only visible on small screens */}
+            <div className="md:hidden mb-12">
+              {timelineEvents.map((event, index) => {
+                // Determine which icon to use based on the event title
+                let EventIcon = Clock;
+                if (event.title.includes("Registration Opens")) EventIcon = Calendar;
+                else if (event.title.includes("Registration Closes")) EventIcon = Calendar;
+                else if (event.title.includes("Opening Ceremony")) EventIcon = Calendar;
+                else if (event.title.includes("Contest Days")) EventIcon = Trophy;
+                else if (event.title.includes("Awards")) EventIcon = Trophy;
+
+                return (
+                  <motion.div
+                    key={`mobile-${index}`}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                    className="relative pl-8 pb-10 border-l-2 border-lightBlue/30 last:border-transparent"
+                  >
+                    {/* Timeline dot */}
+                    <div className="absolute left-[-9px] top-0 w-4 h-4 rounded-full bg-lightBlue animate-pulse"></div>
+
+                    <motion.div
+                      whileHover={{ scale: 1.02, y: -3 }}
+                      className="glassmorphism p-5 rounded-lg border border-white/10 hover:border-lightBlue/30 transition-all duration-300"
                     >
-                      <div className="flex items-center mb-2 justify-start md:justify-end">
-                        <Clock className="h-5 w-5 text-lightBlue mr-2" />
+                      <div className="flex items-center mb-3">
+                        <div className="bg-lightBlue/20 p-2 rounded-full mr-3">
+                          <EventIcon className="h-5 w-5 text-lightBlue" />
+                        </div>
                         <h4 className="text-lg font-medium text-lightBlue">{event.date}</h4>
                       </div>
                       <h3 className="text-xl font-bold text-white mb-2">{event.title}</h3>
                       <p className="text-gray-300">{event.description}</p>
+
+                      <div className="mt-4 pt-3 border-t border-white/10">
+                        <div className="flex items-center text-lightBlue text-sm">
+                          <div className="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                            <motion.div
+                              className="h-full bg-gradient-to-r from-blue-500 to-lightBlue"
+                              initial={{ width: "0%" }}
+                              whileInView={{ width: "100%" }}
+                              transition={{ duration: 1, delay: 0.3 }}
+                              viewport={{ once: true }}
+                            />
+                          </div>
+                          <span className="ml-2 whitespace-nowrap font-medium">
+                            {new Date(event.date) < new Date() ? "Completed" : "Coming soon"}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* Desktop Timeline Events - Hidden on mobile */}
+            <div className="hidden md:block space-y-16 md:space-y-24 relative">
+              {timelineEvents.map((event, index) => {
+                // Determine which icon to use based on the event title
+                let EventIcon = Clock;
+                if (event.title.includes("Registration Opens")) EventIcon = Calendar;
+                else if (event.title.includes("Registration Closes")) EventIcon = Calendar;
+                else if (event.title.includes("Opening Ceremony")) EventIcon = Calendar;
+                else if (event.title.includes("Contest Days")) EventIcon = Trophy;
+                else if (event.title.includes("Awards")) EventIcon = Trophy;
+
+                return (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: index * 0.15 }}
+                    viewport={{ once: true }}
+                    className={`flex flex-col md:flex-row items-center ${
+                      index % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+                    }`}
+                  >
+                    <div className={`md:w-1/2 mb-6 md:mb-0 flex ${
+                      index % 2 === 0 ? "justify-center md:justify-end md:pr-8" : "justify-center md:justify-start md:pl-8"
+                    }`}>
+                      <motion.div
+                        whileHover={{
+                          scale: 1.03,
+                          boxShadow: "0 0 15px rgba(11, 94, 215, 0.3)",
+                          borderColor: "rgba(11, 94, 215, 0.5)",
+                          y: -5
+                        }}
+                        initial={{
+                          opacity: 0,
+                          x: index % 2 === 0 ? -20 : 20
+                        }}
+                        whileInView={{
+                          opacity: 1,
+                          x: 0
+                        }}
+                        transition={{
+                          duration: 0.7,
+                          delay: index * 0.1,
+                          type: "spring",
+                          stiffness: 100
+                        }}
+                        viewport={{ once: true }}
+                        className={`glassmorphism p-6 rounded-xl max-w-md border border-white/10 transition-all duration-300 hover:border-lightBlue/30 ${
+                          index % 2 === 0 ? "md:text-right" : "md:text-left"
+                        }`}
+                        style={{
+                          transformStyle: "preserve-3d",
+                          perspective: "1000px"
+                        }}
+                      >
+                        <div className={`flex items-center mb-3 ${
+                          index % 2 === 0 ? "justify-start md:justify-end" : "justify-start"
+                        }`}>
+                          <div className="bg-lightBlue/20 p-2 rounded-full mr-3 md:order-1">
+                            <EventIcon className="h-5 w-5 text-lightBlue" />
+                          </div>
+                          <h4 className="text-lg font-medium text-lightBlue">{event.date}</h4>
+                        </div>
+                        <h3 className="text-xl font-bold text-white mb-3">{event.title}</h3>
+                        <p className="text-gray-300">{event.description}</p>
+
+                        {/* Interactive element - only visible on hover */}
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          whileHover={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="mt-4 pt-4 border-t border-white/10"
+                        >
+                          <div className="flex items-center text-lightBlue text-sm">
+                            <div className="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                              <motion.div
+                                className="h-full bg-gradient-to-r from-blue-500 to-lightBlue animate-timeline-glow"
+                                initial={{ width: "0%" }}
+                                whileInView={{ width: "100%" }}
+                                transition={{ duration: 1, delay: 0.5 }}
+                                viewport={{ once: true }}
+                              />
+                            </div>
+                            <span className="ml-2 whitespace-nowrap font-medium">
+                              {new Date(event.date) < new Date() ? "Completed" : "Coming soon"}
+                            </span>
+                          </div>
+                        </motion.div>
+                      </motion.div>
                     </div>
-                  </div>
 
-                  {/* Timeline Dot */}
-                  <div className="hidden md:flex items-center justify-center z-10">
-                    <div className="w-6 h-6 rounded-full bg-lightBlue animate-pulse"></div>
-                  </div>
+                    {/* Timeline Node */}
+                    <div className="hidden md:flex items-center justify-center z-10">
+                      <motion.div
+                        initial={{ scale: 0.5, opacity: 0 }}
+                        whileInView={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.5, delay: index * 0.2 }}
+                        viewport={{ once: true }}
+                        whileHover={{ scale: 1.2 }}
+                        className="relative cursor-pointer"
+                      >
+                        <div className="absolute -inset-4 bg-lightBlue rounded-full opacity-20 animate-timeline-pulse"></div>
+                        <div className="w-10 h-10 rounded-full bg-darkBlue border-2 border-lightBlue flex items-center justify-center relative z-10 shadow-lg">
+                          <EventIcon className="h-4 w-4 text-lightBlue" />
+                        </div>
+                      </motion.div>
+                    </div>
 
-                  {/* Empty Space for Alternating Layout */}
-                  <div className="md:w-1/2"></div>
-                </motion.div>
-              ))}
+                    {/* Empty Space for Alternating Layout */}
+                    <div className="md:w-1/2"></div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { useFirebase } from "@/lib/firebase/firebase-provider"
 import { ContestQuestion } from "@/lib/types/question"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Switch } from "@/components/ui/switch"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -351,48 +352,59 @@ export function QuestionManagement({ isLoading = false }: QuestionManagementProp
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="releaseTime" className="text-white">Release Time</Label>
-                      <Input
-                        id="releaseTime"
-                        type="datetime-local"
-                        value={newQuestion.releaseTime instanceof Date
-                          ? newQuestion.releaseTime.toISOString().slice(0, 16)
-                          : typeof newQuestion.releaseTime === 'string'
-                            ? new Date(newQuestion.releaseTime).toISOString().slice(0, 16)
-                            : new Date().toISOString().slice(0, 16)}
-                        onChange={(e) => setNewQuestion({...newQuestion, releaseTime: new Date(e.target.value)})}
-                        className="bg-darkBlue/50 border-gray-700 text-white"
+                  <div className="p-4 border border-lightBlue/30 rounded-md bg-lightBlue/10 mb-4">
+                    <div className="flex items-center space-x-3 mb-2">
+                      <Switch
+                        id="isActive"
+                        checked={newQuestion.isActive}
+                        onCheckedChange={(checked) => setNewQuestion({...newQuestion, isActive: checked})}
                       />
+                      <Label htmlFor="isActive" className="text-white font-medium">Make Question Active</Label>
                     </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="endTime" className="text-white">End Time</Label>
-                      <Input
-                        id="endTime"
-                        type="datetime-local"
-                        value={newQuestion.endTime instanceof Date
-                          ? newQuestion.endTime.toISOString().slice(0, 16)
-                          : typeof newQuestion.endTime === 'string'
-                            ? new Date(newQuestion.endTime).toISOString().slice(0, 16)
-                            : new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString().slice(0, 16)}
-                        onChange={(e) => setNewQuestion({...newQuestion, endTime: new Date(e.target.value)})}
-                        className="bg-darkBlue/50 border-gray-700 text-white"
-                      />
-                    </div>
+                    <p className="text-gray-300 text-sm">
+                      When active, this question will be visible to participants who have registered for this contest.
+                    </p>
                   </div>
 
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      id="isActive"
-                      checked={newQuestion.isActive}
-                      onChange={(e) => setNewQuestion({...newQuestion, isActive: e.target.checked})}
-                      className="rounded border-gray-700 bg-darkBlue/50 text-lightBlue"
-                    />
-                    <Label htmlFor="isActive" className="text-white">Active</Label>
-                  </div>
+                  <details className="mb-4">
+                    <summary className="cursor-pointer text-gray-300 mb-2">Advanced Timing Options (Optional)</summary>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-700 rounded-md mt-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="releaseTime" className="text-gray-400">Release Time</Label>
+                        <Input
+                          id="releaseTime"
+                          type="datetime-local"
+                          value={newQuestion.releaseTime instanceof Date
+                            ? newQuestion.releaseTime.toISOString().slice(0, 16)
+                            : typeof newQuestion.releaseTime === 'string'
+                              ? new Date(newQuestion.releaseTime).toISOString().slice(0, 16)
+                              : new Date().toISOString().slice(0, 16)}
+                          onChange={(e) => setNewQuestion({...newQuestion, releaseTime: new Date(e.target.value)})}
+                          className="bg-darkBlue/50 border-gray-700 text-white"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="endTime" className="text-gray-400">End Time</Label>
+                        <Input
+                          id="endTime"
+                          type="datetime-local"
+                          value={newQuestion.endTime instanceof Date
+                            ? newQuestion.endTime.toISOString().slice(0, 16)
+                            : typeof newQuestion.endTime === 'string'
+                              ? new Date(newQuestion.endTime).toISOString().slice(0, 16)
+                              : new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString().slice(0, 16)}
+                          onChange={(e) => setNewQuestion({...newQuestion, endTime: new Date(e.target.value)})}
+                          className="bg-darkBlue/50 border-gray-700 text-white"
+                        />
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-xs text-gray-400 italic">
+                          Note: These fields are no longer used for question visibility. Questions are shown based on the Active status only.
+                        </p>
+                      </div>
+                    </div>
+                  </details>
                 </div>
 
                 <DialogFooter className="mt-6">
@@ -418,13 +430,11 @@ export function QuestionManagement({ isLoading = false }: QuestionManagementProp
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-gray-300">Title</TableHead>
-                    <TableHead className="text-gray-300">Difficulty</TableHead>
-                    <TableHead className="text-gray-300">Points</TableHead>
-                    <TableHead className="text-gray-300">Release Time</TableHead>
-                    <TableHead className="text-gray-300">End Time</TableHead>
-                    <TableHead className="text-gray-300">Status</TableHead>
-                    <TableHead className="text-gray-300">Actions</TableHead>
+                    <TableHead className="text-gray-300 w-1/4">Title</TableHead>
+                    <TableHead className="text-gray-300 w-1/6">Difficulty</TableHead>
+                    <TableHead className="text-gray-300 w-1/6">Points</TableHead>
+                    <TableHead className="text-gray-300 w-1/6">Status</TableHead>
+                    <TableHead className="text-gray-300 w-1/6">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -441,18 +451,36 @@ export function QuestionManagement({ isLoading = false }: QuestionManagementProp
                         </span>
                       </TableCell>
                       <TableCell className="text-white">{question.points}</TableCell>
-                      <TableCell className="text-white">{formatDateTime(question.releaseTime)}</TableCell>
-                      <TableCell className="text-white">{formatDateTime(question.endTime)}</TableCell>
                       <TableCell>
-                        {question.isActive ? (
-                          <span className="flex items-center text-green-400">
-                            <CheckCircle className="h-4 w-4 mr-1" /> Active
-                          </span>
-                        ) : (
-                          <span className="flex items-center text-gray-400">
-                            <XCircle className="h-4 w-4 mr-1" /> Inactive
-                          </span>
-                        )}
+                        <Button
+                          variant={question.isActive ? "default" : "outline"}
+                          size="sm"
+                          className={question.isActive ?
+                            "bg-green-600 hover:bg-green-700 text-white" :
+                            "border-gray-600 text-gray-400 hover:bg-gray-700/20"}
+                          onClick={async () => {
+                            try {
+                              await updateQuestion(question.id!, {
+                                isActive: !question.isActive
+                              });
+                              toast.success(`Question ${question.isActive ? 'deactivated' : 'activated'} successfully`);
+                              loadQuestions();
+                            } catch (error) {
+                              console.error("Error toggling question status:", error);
+                              toast.error("Failed to update question status");
+                            }
+                          }}
+                        >
+                          {question.isActive ? (
+                            <span className="flex items-center">
+                              <CheckCircle className="h-4 w-4 mr-1" /> Active
+                            </span>
+                          ) : (
+                            <span className="flex items-center">
+                              <XCircle className="h-4 w-4 mr-1" /> Inactive
+                            </span>
+                          )}
+                        </Button>
                       </TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
@@ -592,48 +620,59 @@ export function QuestionManagement({ isLoading = false }: QuestionManagementProp
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="edit-releaseTime" className="text-white">Release Time</Label>
-                  <Input
-                    id="edit-releaseTime"
-                    type="datetime-local"
-                    value={editingQuestion.releaseTime instanceof Date
-                      ? editingQuestion.releaseTime.toISOString().slice(0, 16)
-                      : typeof editingQuestion.releaseTime === 'string'
-                        ? new Date(editingQuestion.releaseTime).toISOString().slice(0, 16)
-                        : new Date().toISOString().slice(0, 16)}
-                    onChange={(e) => setEditingQuestion({...editingQuestion, releaseTime: new Date(e.target.value)})}
-                    className="bg-darkBlue/50 border-gray-700 text-white"
+              <div className="p-4 border border-lightBlue/30 rounded-md bg-lightBlue/10 mb-4">
+                <div className="flex items-center space-x-3 mb-2">
+                  <Switch
+                    id="edit-isActive"
+                    checked={editingQuestion.isActive}
+                    onCheckedChange={(checked) => setEditingQuestion({...editingQuestion, isActive: checked})}
                   />
+                  <Label htmlFor="edit-isActive" className="text-white font-medium">Make Question Active</Label>
                 </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="edit-endTime" className="text-white">End Time</Label>
-                  <Input
-                    id="edit-endTime"
-                    type="datetime-local"
-                    value={editingQuestion.endTime instanceof Date
-                      ? editingQuestion.endTime.toISOString().slice(0, 16)
-                      : typeof editingQuestion.endTime === 'string'
-                        ? new Date(editingQuestion.endTime).toISOString().slice(0, 16)
-                        : new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString().slice(0, 16)}
-                    onChange={(e) => setEditingQuestion({...editingQuestion, endTime: new Date(e.target.value)})}
-                    className="bg-darkBlue/50 border-gray-700 text-white"
-                  />
-                </div>
+                <p className="text-gray-300 text-sm">
+                  When active, this question will be visible to participants who have registered for this contest.
+                </p>
               </div>
 
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="edit-isActive"
-                  checked={editingQuestion.isActive}
-                  onChange={(e) => setEditingQuestion({...editingQuestion, isActive: e.target.checked})}
-                  className="rounded border-gray-700 bg-darkBlue/50 text-lightBlue"
-                />
-                <Label htmlFor="edit-isActive" className="text-white">Active</Label>
-              </div>
+              <details className="mb-4">
+                <summary className="cursor-pointer text-gray-300 mb-2">Advanced Timing Options (Optional)</summary>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border border-gray-700 rounded-md mt-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-releaseTime" className="text-gray-400">Release Time</Label>
+                    <Input
+                      id="edit-releaseTime"
+                      type="datetime-local"
+                      value={editingQuestion.releaseTime instanceof Date
+                        ? editingQuestion.releaseTime.toISOString().slice(0, 16)
+                        : typeof editingQuestion.releaseTime === 'string'
+                          ? new Date(editingQuestion.releaseTime).toISOString().slice(0, 16)
+                          : new Date().toISOString().slice(0, 16)}
+                      onChange={(e) => setEditingQuestion({...editingQuestion, releaseTime: new Date(e.target.value)})}
+                      className="bg-darkBlue/50 border-gray-700 text-white"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-endTime" className="text-gray-400">End Time</Label>
+                    <Input
+                      id="edit-endTime"
+                      type="datetime-local"
+                      value={editingQuestion.endTime instanceof Date
+                        ? editingQuestion.endTime.toISOString().slice(0, 16)
+                        : typeof editingQuestion.endTime === 'string'
+                          ? new Date(editingQuestion.endTime).toISOString().slice(0, 16)
+                          : new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString().slice(0, 16)}
+                      onChange={(e) => setEditingQuestion({...editingQuestion, endTime: new Date(e.target.value)})}
+                      className="bg-darkBlue/50 border-gray-700 text-white"
+                    />
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-xs text-gray-400 italic">
+                      Note: These fields are no longer used for question visibility. Questions are shown based on the Active status only.
+                    </p>
+                  </div>
+                </div>
+              </details>
             </div>
           )}
 

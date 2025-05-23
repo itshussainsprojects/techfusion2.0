@@ -47,12 +47,10 @@ service cloud.firestore {
       allow create, update, delete: if isAdmin();
 
       // Admins can read all questions
-      // Regular users can only read active questions that are within the release time window
+      // Regular users can only read active questions
       allow read: if isAdmin() ||
         (request.auth != null &&
-         resource.data.isActive == true &&
-         resource.data.releaseTime <= request.time &&
-         resource.data.endTime >= request.time);
+         resource.data.isActive == true);
     }
 
     // Question submissions collection rules

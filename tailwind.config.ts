@@ -84,6 +84,29 @@ const config = {
           "0%, 100%": { boxShadow: "0 0 5px #0B5ED7, 0 0 10px #0B5ED7" },
           "50%": { boxShadow: "0 0 20px #0B5ED7, 0 0 30px #0B5ED7" },
         },
+        "timeline-pulse": {
+          "0%, 100%": {
+            boxShadow: "0 0 0 0 rgba(11, 94, 215, 0.7)",
+            transform: "scale(1)"
+          },
+          "50%": {
+            boxShadow: "0 0 0 10px rgba(11, 94, 215, 0)",
+            transform: "scale(1.05)"
+          },
+        },
+        "timeline-glow": {
+          "0%": { boxShadow: "0 0 5px rgba(11, 94, 215, 0.5)" },
+          "50%": { boxShadow: "0 0 20px rgba(11, 94, 215, 0.8)" },
+          "100%": { boxShadow: "0 0 5px rgba(11, 94, 215, 0.5)" },
+        },
+        "timeline-progress": {
+          "0%": { width: "0%", opacity: 0.7 },
+          "100%": { width: "100%", opacity: 1 },
+        },
+        "timeline-appear": {
+          "0%": { transform: "translateY(20px)", opacity: 0 },
+          "100%": { transform: "translateY(0)", opacity: 1 },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -91,6 +114,10 @@ const config = {
         float: "float 3s ease-in-out infinite",
         pulse: "pulse 2s ease-in-out infinite",
         glow: "glow 2s ease-in-out infinite",
+        "timeline-pulse": "timeline-pulse 3s ease-in-out infinite",
+        "timeline-glow": "timeline-glow 2s ease-in-out infinite",
+        "timeline-progress": "timeline-progress 2s ease-out forwards",
+        "timeline-appear": "timeline-appear 0.5s ease-out forwards",
       },
     },
   },

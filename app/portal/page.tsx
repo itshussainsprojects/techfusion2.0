@@ -115,15 +115,15 @@ const contestDetails = {
     title: "Speed Coding with AI",
     description: "Rapid problem-solving coding contest with AI tools.",
     date: "June 27, 2023",
-    location: "Computer Science Lab, Room 201",
-    teamSize: "Individual",
+    location: "CS Lab main",
+    teamSize: "Individual or 2 members",
     duration: "4 hours",
     prizes: ["3,000 PKR First Prize", "2,000 PKR Second Prize", "1,000 PKR Third Prize"],
     requirements: [
       "Laptop with internet connection",
       "Knowledge of at least one programming language",
       "Familiarity with AI coding assistants",
-      "GitHub account",
+      "GitHub account(Optional)",
     ],
     schedule: [
       { time: "June 27, 9:00 AM", event: "Check-in & Setup" },
@@ -138,7 +138,7 @@ const contestDetails = {
     title: "Devathon",
     description: "A 24-hour development marathon to build innovative software solutions.",
     date: "June 27, 2023",
-    location: "Engineering Building, Main Hall",
+    location: "Cyber lab",
     teamSize: "2-3 members",
     duration: "24 hours",
     prizes: ["10,000 PKR First Prize", "7,000 PKR Second Prize", "5,000 PKR Third Prize"],
@@ -639,20 +639,35 @@ export default function PortalPage() {
             </CardHeader>
             <CardContent>
               <Tabs defaultValue="details" className="w-full">
-                <TabsList className="grid w-full grid-cols-4 bg-darkBlue/50">
-                  <TabsTrigger value="details" className="text-white">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 bg-darkBlue/50 p-1.5 gap-2">
+                  <TabsTrigger
+                    value="details"
+                    className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                  >
                     Details
                   </TabsTrigger>
-                  <TabsTrigger value="requirements" className="text-white">
-                    Requirements
+                  <TabsTrigger
+                    value="requirements"
+                    className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                  >
+                    <span className="hidden md:inline">Requirements</span>
+                    <span className="md:hidden">Req.</span>
                   </TabsTrigger>
-                  <TabsTrigger value="schedule" className="text-white">
-                    Schedule
+                  <TabsTrigger
+                    value="schedule"
+                    className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                  >
+                    <span className="hidden md:inline">Schedule</span>
+                    <span className="md:hidden">Sched.</span>
                   </TabsTrigger>
                   {(contestToUse === 'speed-coding-with-ai' || contestToUse === 'devathon') && (
-                    <TabsTrigger value="questions" className="text-white">
-                      <Code className="h-4 w-4 mr-2" />
-                      Questions
+                    <TabsTrigger
+                      value="questions"
+                      className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                    >
+                      <Code className="h-3 w-3 md:h-4 md:w-4 mr-1 md:mr-2" />
+                      <span className="hidden md:inline">Questions</span>
+                      <span className="md:hidden">Q.</span>
                     </TabsTrigger>
                   )}
                 </TabsList>

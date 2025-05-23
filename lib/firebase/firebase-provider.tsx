@@ -923,19 +923,14 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
 
     try {
       const questionsRef = collection(db, "questions")
-      const now = Timestamp.fromDate(new Date())
 
       // Get questions that:
       // 1. Match the contest type
-      // 2. Are active
-      // 3. Release time is in the past
-      // 4. End time is in the future
+      // 2. Are active (only check isActive flag)
       const q = query(
         questionsRef,
         where("contestType", "==", contestType),
-        where("isActive", "==", true),
-        where("releaseTime", "<=", now),
-        where("endTime", ">=", now)
+        where("isActive", "==", true)
       )
 
       const snapshot = await getDocs(q)

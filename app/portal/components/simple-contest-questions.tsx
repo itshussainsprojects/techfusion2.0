@@ -21,17 +21,17 @@ interface SimpleContestQuestionsProps {
 
 export function SimpleContestQuestions({ contestType, participant }: SimpleContestQuestionsProps) {
   const { getActiveQuestions, submitAnswer } = useFirebase()
-  
+
   const [questions, setQuestions] = useState<ContestQuestion[]>([])
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState<Record<string, boolean>>({})
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [codeUrls, setCodeUrls] = useState<Record<string, string>>({})
-  
+
   useEffect(() => {
     loadQuestions()
   }, [contestType])
-  
+
   const loadQuestions = async () => {
     try {
       setLoading(true)
@@ -44,16 +44,16 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
       setLoading(false)
     }
   }
-  
+
   const handleSubmit = async (questionId: string) => {
     if (!participant.email) {
       toast.error("You must be logged in to submit answers")
       return
     }
-    
+
     try {
       setSubmitting(prev => ({ ...prev, [questionId]: true }))
-      
+
       await submitAnswer({
         questionId,
         participantId: participant.email,
@@ -62,13 +62,13 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
         submittedAt: new Date(),
         status: 'pending'
       })
-      
+
       toast.success("Answer submitted successfully")
-      
+
       // Clear the answer and code URL
       setAnswers(prev => ({ ...prev, [questionId]: '' }))
       setCodeUrls(prev => ({ ...prev, [questionId]: '' }))
-      
+
       // Reload questions
       await loadQuestions()
     } catch (error: any) {
@@ -78,25 +78,25 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
       setSubmitting(prev => ({ ...prev, [questionId]: false }))
     }
   }
-  
+
   const formatDateTime = (date: Date | string) => {
     if (!date) return 'N/A'
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return format(dateObj, 'MMM dd, yyyy HH:mm')
   }
-  
+
   const getTimeRemaining = (endTime: Date | string) => {
     if (!endTime) return 'N/A'
     const endDate = typeof endTime === 'string' ? new Date(endTime) : endTime
     const now = new Date()
-    
+
     if (now > endDate) {
       return 'Ended'
     }
-    
+
     return formatDistance(endDate, now, { addSuffix: true })
   }
-  
+
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case 'easy':
@@ -109,7 +109,7 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
         return 'text-gray-400 bg-gray-500/20'
     }
   }
-  
+
   if (loading) {
     return (
       <div className="flex justify-center py-8">
@@ -117,7 +117,7 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
       </div>
     )
   }
-  
+
   if (questions.length === 0) {
     return (
       <Card className="glassmorphism border-lightBlue/20">
@@ -131,14 +131,14 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Clock className="h-16 w-16 text-gray-400 mb-4" />
             <p className="text-gray-300 max-w-md">
-              Questions will be available at the scheduled time. Please check back later.
+              No questions are currently active for this contest. Please check back later.
             </p>
           </div>
         </CardContent>
       </Card>
     )
   }
-  
+
   return (
     <div className="space-y-6">
       <Card className="glassmorphism border-lightBlue/20">
@@ -147,60 +147,71 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
             {contestType === 'speed-coding-with-ai' ? 'Speed Coding with AI' : 'Devathon'} Questions
           </CardTitle>
           <CardDescription className="text-gray-300">
-            Complete the following questions before the deadline
+            Complete the following active questions for this contest
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
             {questions.map((question) => {
               const isSubmitting = submitting[question.id || ''] || false
-              
+
               return (
                 <Card key={question.id} className="border border-gray-700 bg-darkBlue/30">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg font-bold text-white flex items-center">
+                        <CardTitle className="text-lg font-bold text-white">
                           {question.title}
-                          <span className={`ml-2 text-xs px-2 py-1 rounded ${getDifficultyColor(question.difficulty)}`}>
+                        </CardTitle>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <span className={`text-xs px-2 py-1 rounded ${getDifficultyColor(question.difficulty)}`}>
                             {question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
                           </span>
-                          <span className="ml-2 text-xs px-2 py-1 rounded bg-lightBlue/20 text-lightBlue">
+                          <span className="text-xs px-2 py-1 rounded bg-lightBlue/20 text-lightBlue">
                             {question.points} points
                           </span>
-                        </CardTitle>
-                        <CardDescription className="text-gray-300 mt-1">
-                          Due: {formatDateTime(question.endTime)} ({getTimeRemaining(question.endTime)})
-                        </CardDescription>
+                        </div>
                       </div>
                     </div>
                   </CardHeader>
-                  
+
                   <CardContent>
                     <Tabs defaultValue="description" className="w-full">
-                      <TabsList className="grid w-full grid-cols-3 bg-darkBlue/50">
-                        <TabsTrigger value="description" className="text-white">
-                          Description
+                      <TabsList className="grid w-full grid-cols-3 bg-darkBlue/50 p-1.5 gap-2">
+                        <TabsTrigger
+                          value="description"
+                          className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                        >
+                          <span className="hidden md:inline">Description</span>
+                          <span className="md:hidden">Desc.</span>
                         </TabsTrigger>
-                        <TabsTrigger value="examples" className="text-white">
-                          Examples
+                        <TabsTrigger
+                          value="examples"
+                          className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                        >
+                          <span className="hidden md:inline">Examples</span>
+                          <span className="md:hidden">Ex.</span>
                         </TabsTrigger>
-                        <TabsTrigger value="submission" className="text-white">
-                          Submission
+                        <TabsTrigger
+                          value="submission"
+                          className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                        >
+                          <span className="hidden md:inline">Submission</span>
+                          <span className="md:hidden">Submit</span>
                         </TabsTrigger>
                       </TabsList>
-                      
+
                       <TabsContent value="description" className="space-y-4 mt-4">
                         <div className="prose prose-invert max-w-none">
                           <div className="text-gray-300 whitespace-pre-line">{question.description}</div>
-                          
+
                           {question.constraints && (
                             <div className="mt-4">
                               <h4 className="text-white font-medium mb-2">Constraints:</h4>
                               <div className="text-gray-300 whitespace-pre-line">{question.constraints}</div>
                             </div>
                           )}
-                          
+
                           {Array.isArray(question.hints) && question.hints.length > 0 && (
                             <div className="mt-4">
                               <h4 className="text-white font-medium mb-2">Hints:</h4>
@@ -213,7 +224,7 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
                           )}
                         </div>
                       </TabsContent>
-                      
+
                       <TabsContent value="examples" className="space-y-4 mt-4">
                         {question.sampleInput && question.sampleOutput ? (
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -223,7 +234,7 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
                                 {question.sampleInput}
                               </pre>
                             </div>
-                            
+
                             <div className="space-y-2">
                               <h4 className="text-white font-medium">Sample Output:</h4>
                               <pre className="bg-gray-800/50 p-3 rounded text-gray-300 overflow-x-auto">
@@ -235,7 +246,7 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
                           <div className="text-gray-300">No examples provided for this question.</div>
                         )}
                       </TabsContent>
-                      
+
                       <TabsContent value="submission" className="space-y-4 mt-4">
                         <div className="space-y-4">
                           <div className="space-y-2">
@@ -249,7 +260,7 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
                               disabled={isSubmitting}
                             />
                           </div>
-                          
+
                           <div className="space-y-2">
                             <Label htmlFor={`code-url-${question.id}`} className="text-white">Code URL (Optional)</Label>
                             <Input
@@ -264,7 +275,7 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
                               If your solution is too complex to paste here, you can provide a link to a GitHub repository or other code sharing platform.
                             </p>
                           </div>
-                          
+
                           <Button
                             onClick={() => handleSubmit(question.id || '')}
                             className="bg-lightBlue hover:bg-lightBlue/80 text-white w-full"
@@ -282,7 +293,7 @@ export function SimpleContestQuestions({ contestType, participant }: SimpleConte
                               </>
                             )}
                           </Button>
-                          
+
                           <div className="flex items-center text-yellow-400 text-sm mt-2">
                             <AlertTriangle className="h-4 w-4 mr-1 flex-shrink-0" />
                             <span>

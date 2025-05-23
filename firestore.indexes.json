@@ -25,14 +25,6 @@
         {
           "fieldPath": "isActive",
           "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "releaseTime",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "endTime",
-          "order": "ASCENDING"
         }
       ]
     },

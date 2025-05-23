@@ -160,7 +160,7 @@ export function ContestQuestions({ contestType, participant }: ContestQuestionsP
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Clock className="h-16 w-16 text-gray-400 mb-4" />
             <p className="text-gray-300 max-w-md">
-              Questions will be available at the scheduled time. Please check back later.
+              No questions are currently active for this contest. Please check back later.
             </p>
           </div>
         </CardContent>
@@ -176,7 +176,7 @@ export function ContestQuestions({ contestType, participant }: ContestQuestionsP
             {contestType === 'speed-coding-with-ai' ? 'Speed Coding with AI' : 'Devathon'} Questions
           </CardTitle>
           <CardDescription className="text-gray-300">
-            Complete the following questions before the deadline
+            Complete the following active questions for this contest
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -190,18 +190,17 @@ export function ContestQuestions({ contestType, participant }: ContestQuestionsP
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg font-bold text-white flex items-center">
+                        <CardTitle className="text-lg font-bold text-white">
                           {question.title}
-                          <span className={`ml-2 text-xs px-2 py-1 rounded ${getDifficultyColor(question.difficulty)}`}>
+                        </CardTitle>
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          <span className={`text-xs px-2 py-1 rounded ${getDifficultyColor(question.difficulty)}`}>
                             {question.difficulty.charAt(0).toUpperCase() + question.difficulty.slice(1)}
                           </span>
-                          <span className="ml-2 text-xs px-2 py-1 rounded bg-lightBlue/20 text-lightBlue">
+                          <span className="text-xs px-2 py-1 rounded bg-lightBlue/20 text-lightBlue">
                             {question.points} points
                           </span>
-                        </CardTitle>
-                        <CardDescription className="text-gray-300 mt-1">
-                          Due: {formatDateTime(question.endTime)} ({getTimeRemaining(question.endTime)})
-                        </CardDescription>
+                        </div>
                       </div>
 
                       {hasSubmitted && (
@@ -215,15 +214,27 @@ export function ContestQuestions({ contestType, participant }: ContestQuestionsP
 
                   <CardContent>
                     <Tabs defaultValue="description" className="w-full">
-                      <TabsList className="grid w-full grid-cols-3 bg-darkBlue/50">
-                        <TabsTrigger value="description" className="text-white">
-                          Description
+                      <TabsList className="grid w-full grid-cols-3 bg-darkBlue/50 p-1.5 gap-2">
+                        <TabsTrigger
+                          value="description"
+                          className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                        >
+                          <span className="hidden md:inline">Description</span>
+                          <span className="md:hidden">Desc.</span>
                         </TabsTrigger>
-                        <TabsTrigger value="examples" className="text-white">
-                          Examples
+                        <TabsTrigger
+                          value="examples"
+                          className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                        >
+                          <span className="hidden md:inline">Examples</span>
+                          <span className="md:hidden">Ex.</span>
                         </TabsTrigger>
-                        <TabsTrigger value="submission" className="text-white">
-                          Submission
+                        <TabsTrigger
+                          value="submission"
+                          className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
+                        >
+                          <span className="hidden md:inline">Submission</span>
+                          <span className="md:hidden">Submit</span>
                         </TabsTrigger>
                       </TabsList>
 
