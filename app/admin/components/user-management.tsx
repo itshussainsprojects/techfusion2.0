@@ -2,7 +2,7 @@
 "use client"
 
 import React, { useState } from "react"
-import { Loader2, Trash2, Edit, AlertCircle, CheckCircle, XCircle, Clock } from "lucide-react"
+import { Loader2, Trash2, Edit, AlertCircle, CheckCircle, XCircle, Clock, Users, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -184,6 +184,7 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
                   <TableHead className="text-gray-300">Roll Number</TableHead>
                   <TableHead className="text-gray-300">Department</TableHead>
                   <TableHead className="text-gray-300">Contest</TableHead>
+                  <TableHead className="text-gray-300">Team Members</TableHead>
                   <TableHead className="text-gray-300">Payment Status</TableHead>
                   <TableHead className="text-gray-300">Approval Status</TableHead>
                   <TableHead className="text-gray-300">Actions</TableHead>
@@ -220,6 +221,37 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
                         </div>
                       ) : (
                         participant.contest
+                      )}
+                    </TableCell>
+                    <TableCell className="text-white">
+                      {participant.teamMembers && Object.keys(participant.teamMembers).length > 0 ? (
+                        <div className="space-y-2">
+                          {Object.entries(participant.teamMembers).map(([contestId, members]) => (
+                            <div key={contestId} className="text-xs">
+                              <div className="flex items-center gap-1 text-lightBlue font-medium">
+                                <Users className="h-3 w-3" />
+                                {contestId.replace(/-/g, ' ')} ({members.length + 1} members)
+                              </div>
+                              <div className="ml-4 space-y-1 mt-1">
+                                <div className="flex items-center gap-1 text-green-400">
+                                  <User className="h-3 w-3" />
+                                  {participant.name} (Team Leader)
+                                </div>
+                                {members.map((member, index) => (
+                                  <div key={index} className="flex items-center gap-1 text-gray-300">
+                                    <User className="h-3 w-3" />
+                                    {member.name} ({member.rollNumber})
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 text-gray-400 text-xs">
+                          <User className="h-3 w-3" />
+                          Individual
+                        </div>
                       )}
                     </TableCell>
                     <TableCell>
@@ -516,6 +548,84 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
                                   </div>
                                 )}
                               </div>
+
+                              {/* Team Members Section */}
+                              {editingParticipant?.teamMembers && Object.keys(editingParticipant.teamMembers).length > 0 && (
+                                <div className="border-t border-gray-700 pt-4 mt-4">
+                                  <Label className="text-white mb-3 block">Team Members</Label>
+                                  <div className="space-y-4">
+                                    {Object.entries(editingParticipant.teamMembers).map(([contestId, members]) => (
+                                      <div key={contestId} className="bg-darkBlue/30 p-4 rounded-lg">
+                                        <div className="flex items-center gap-2 mb-3">
+                                          <Users className="h-4 w-4 text-lightBlue" />
+                                          <h4 className="text-lightBlue font-medium">
+                                            {contestId.replace(/-/g, ' ')} Team ({members.length + 1} members)
+                                          </h4>
+                                        </div>
+
+                                        {/* Team Leader */}
+                                        <div className="mb-3 p-3 bg-green-500/10 border border-green-500/20 rounded">
+                                          <div className="flex items-center gap-2 mb-2">
+                                            <User className="h-4 w-4 text-green-400" />
+                                            <span className="text-green-400 font-medium">Team Leader</span>
+                                          </div>
+                                          <div className="grid grid-cols-2 gap-2 text-sm">
+                                            <div>
+                                              <span className="text-gray-400">Name:</span>
+                                              <span className="text-white ml-2">{editingParticipant.name}</span>
+                                            </div>
+                                            <div>
+                                              <span className="text-gray-400">Roll:</span>
+                                              <span className="text-white ml-2">{editingParticipant.rollNumber}</span>
+                                            </div>
+                                            <div>
+                                              <span className="text-gray-400">Email:</span>
+                                              <span className="text-white ml-2">{editingParticipant.email}</span>
+                                            </div>
+                                            <div>
+                                              <span className="text-gray-400">Dept:</span>
+                                              <span className="text-white ml-2">{editingParticipant.department}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {/* Team Members */}
+                                        {members.length > 0 && (
+                                          <div className="space-y-2">
+                                            <h5 className="text-gray-300 font-medium">Team Members:</h5>
+                                            {members.map((member, index) => (
+                                              <div key={index} className="p-3 bg-darkBlue/50 border border-gray-700 rounded">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                  <User className="h-4 w-4 text-gray-400" />
+                                                  <span className="text-gray-300">Member {index + 1}</span>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-2 text-sm">
+                                                  <div>
+                                                    <span className="text-gray-400">Name:</span>
+                                                    <span className="text-white ml-2">{member.name}</span>
+                                                  </div>
+                                                  <div>
+                                                    <span className="text-gray-400">Roll:</span>
+                                                    <span className="text-white ml-2">{member.rollNumber}</span>
+                                                  </div>
+                                                  <div>
+                                                    <span className="text-gray-400">Email:</span>
+                                                    <span className="text-white ml-2">{member.email}</span>
+                                                  </div>
+                                                  <div>
+                                                    <span className="text-gray-400">Dept:</span>
+                                                    <span className="text-white ml-2">{member.department}</span>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                             <DialogFooter className="sticky bottom-0 bg-darkBlue py-3 border-t border-gray-700 mt-4">
                               <div className="flex justify-end gap-2 w-full">

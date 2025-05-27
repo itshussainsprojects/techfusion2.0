@@ -332,12 +332,22 @@ export type PaymentData = {
   rejectionReason?: string
 }
 
+// Define TeamMember type
+export type TeamMember = {
+  name: string
+  email: string
+  rollNumber: string
+  department: string
+  role?: string
+}
+
 // Define ContestRegistration type for individual contest data
 export type ContestRegistration = {
   contestName: string
   paymentStatus?: 'paid' | 'not paid' | 'partial'
   registrationDate?: Date
-  teamMembers?: string[]
+  teamMembers?: TeamMember[]
+  isTeamLeader?: boolean
 }
 
 // Define ParticipantData type
@@ -358,6 +368,9 @@ export type ParticipantData = {
   // Admin approval status
   approvalStatus?: 'pending' | 'approved' | 'rejected'
   rejectionReason?: string
+  // Team-related fields
+  teamMembers?: Record<string, TeamMember[]> // contestId -> team members
+  isTeamLeader?: Record<string, boolean> // contestId -> is team leader
 }
 
 type FirebaseContextType = {
@@ -638,6 +651,9 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
         paymentStatus: data.paymentStatus,
         approvalStatus: data.approvalStatus || 'pending',
         rejectionReason: data.rejectionReason,
+        // Team-related fields
+        teamMembers: data.teamMembers || {},
+        isTeamLeader: data.isTeamLeader || {},
       };
 
       // If we have old data structure with just a contest field but no contests array

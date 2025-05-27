@@ -325,11 +325,7 @@ const CONTEST_PRICES = {
     currency: 'PKR',
     description: 'E-Sports Tournament Fee'
   },
-  "ctf-cipher": {
-    amount: 500,
-    currency: 'PKR',
-    description: 'CTF/Cipher Hack Competition Fee'
-  },
+
   "in-it-to-win-it": {
     amount: 500,
     currency: 'PKR',
@@ -340,11 +336,7 @@ const CONTEST_PRICES = {
     currency: 'PKR',
     description: 'Speed Coding with AI Competition Fee'
   },
-  "devathon": {
-    amount: 400,
-    currency: 'PKR',
-    description: 'Devathon Registration Fee'
-  },
+
   "treasure-hunt": {
     amount: 1000,
     currency: 'PKR',
@@ -632,6 +624,94 @@ export default function PortalPage() {
             </CardContent>
           </Card>
 
+          {/* Team Members Section */}
+          {participant.teamMembers && Object.keys(participant.teamMembers).length > 0 && (
+            <Card className="glassmorphism border-lightBlue/20">
+              <CardHeader>
+                <CardTitle className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
+                  <Users className="h-6 w-6 text-lightBlue" />
+                  Team Information
+                </CardTitle>
+                <CardDescription className="text-gray-300">
+                  Your team members for registered contests
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {Object.entries(participant.teamMembers).map(([contestId, members]) => (
+                    <div key={contestId} className="bg-darkBlue/30 p-4 rounded-lg border border-lightBlue/20">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Trophy className="h-5 w-5 text-lightBlue" />
+                        <h3 className="text-lightBlue font-medium text-lg">
+                          {contestId.replace(/-/g, ' ')} Team ({members.length + 1} members)
+                        </h3>
+                      </div>
+
+                      {/* Team Leader */}
+                      <div className="mb-4 p-3 bg-green-500/10 border border-green-500/20 rounded">
+                        <div className="flex items-center gap-2 mb-2">
+                          <User className="h-4 w-4 text-green-400" />
+                          <span className="text-green-400 font-medium">Team Leader</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                          <div>
+                            <span className="text-gray-400">Name:</span>
+                            <span className="text-white ml-2">{participant.name}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Roll Number:</span>
+                            <span className="text-white ml-2">{participant.rollNumber}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Email:</span>
+                            <span className="text-white ml-2">{participant.email}</span>
+                          </div>
+                          <div>
+                            <span className="text-gray-400">Department:</span>
+                            <span className="text-white ml-2">{participant.department}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Team Members */}
+                      {members.length > 0 && (
+                        <div className="space-y-3">
+                          <h4 className="text-gray-300 font-medium">Team Members:</h4>
+                          {members.map((member, index) => (
+                            <div key={index} className="p-3 bg-darkBlue/50 border border-gray-700 rounded">
+                              <div className="flex items-center gap-2 mb-2">
+                                <User className="h-4 w-4 text-gray-400" />
+                                <span className="text-gray-300">Member {index + 1}</span>
+                              </div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                <div>
+                                  <span className="text-gray-400">Name:</span>
+                                  <span className="text-white ml-2">{member.name}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Roll Number:</span>
+                                  <span className="text-white ml-2">{member.rollNumber}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Email:</span>
+                                  <span className="text-white ml-2">{member.email}</span>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Department:</span>
+                                  <span className="text-white ml-2">{member.department}</span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Card className="glassmorphism border-lightBlue/20">
             <CardHeader>
               <CardTitle className="text-xl md:text-2xl font-bold text-white">{contest.title}</CardTitle>
@@ -660,7 +740,7 @@ export default function PortalPage() {
                     <span className="hidden md:inline">Schedule</span>
                     <span className="md:hidden">Sched.</span>
                   </TabsTrigger>
-                  {(contestToUse === 'speed-coding-with-ai' || contestToUse === 'devathon') && (
+                  {(contestToUse === 'speed-coding-with-ai') && (
                     <TabsTrigger
                       value="questions"
                       className="text-white px-1 py-1.5 md:px-2 md:py-2 text-xs md:text-base font-medium data-[state=active]:bg-lightBlue/20 data-[state=active]:text-white"
@@ -747,10 +827,10 @@ export default function PortalPage() {
                   </div>
                 </TabsContent>
 
-                {(contestToUse === 'speed-coding-with-ai' || contestToUse === 'devathon') && (
+                {(contestToUse === 'speed-coding-with-ai') && (
                   <TabsContent value="questions" className="mt-4">
                     <SimpleContestQuestions
-                      contestType={contestToUse as 'speed-coding-with-ai' | 'devathon'}
+                      contestType={contestToUse as 'speed-coding-with-ai'}
                       participant={participant}
                     />
                   </TabsContent>

@@ -11,10 +11,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2, CheckCircle2, AlertCircle } from "lucide-react"
 import ParticlesBackground from "@/components/particles-background"
+import { TeamRegistration, CONTEST_TEAM_CONFIGS, type TeamMember } from "@/components/team-registration"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -27,7 +27,9 @@ export default function RegisterPage() {
     department: "",
     contest: "", // Keep for backward compatibility
     contests: [] as string[],
-    contestsData: {} as Record<string, any>
+    contestsData: {} as Record<string, any>,
+    teamMembers: {} as Record<string, TeamMember[]>,
+    isTeamLeader: {} as Record<string, boolean>
   })
 
   const [emailRegister, setEmailRegister] = useState({
@@ -94,10 +96,8 @@ export default function RegisterPage() {
   const CONTEST_PRICES = {
     "robo-war": { amount: 10000, currency: "PKR", description: "Robo War Competition Fee" },
     "e-sports": { amount: 1600, currency: "PKR", description: "E-Sports Tournament Fee" },
-    "ctf-cipher": { amount: 500, currency: "PKR", description: "CTF/Cipher Hack Competition Fee" },
     "in-it-to-win-it": { amount: 500, currency: "PKR", description: "In It to Win It Activities Fee" },
     "speed-coding-with-ai": { amount: 400, currency: "PKR", description: "Speed Coding with AI Competition Fee" },
-    "devathon": { amount: 400, currency: "PKR", description: "Devathon Registration Fee" },
     "treasure-hunt": { amount: 1000, currency: "PKR", description: "Treasure Hunt Team Registration Fee" },
     "60-second-video": { amount: 0, currency: "PKR", description: "60 Second Video Competition - Free" },
     "eye-sight-camp": { amount: 0, currency: "PKR", description: "Eye Sight Camp - Free" },
@@ -132,6 +132,8 @@ export default function RegisterPage() {
 
       // Update contestsData
       const newContestsData = { ...(prev.contestsData || {}) };
+      const newTeamMembers = { ...(prev.teamMembers || {}) };
+      const newIsTeamLeader = { ...(prev.isTeamLeader || {}) };
 
       if (!isSelected) {
         // Add contest data when selected
@@ -140,9 +142,17 @@ export default function RegisterPage() {
           paymentStatus: 'not paid',
           registrationDate: new Date()
         };
+        // Initialize team data for contests that support teams
+        const config = CONTEST_TEAM_CONFIGS[contestName as keyof typeof CONTEST_TEAM_CONFIGS];
+        if (config && config.max > 1) {
+          newTeamMembers[contestName] = [];
+          newIsTeamLeader[contestName] = true;
+        }
       } else {
         // Remove contest data when deselected
         delete newContestsData[contestName];
+        delete newTeamMembers[contestName];
+        delete newIsTeamLeader[contestName];
       }
 
       // Also update the single contest field for backward compatibility
@@ -153,9 +163,21 @@ export default function RegisterPage() {
         ...prev,
         contests: newContests,
         contestsData: newContestsData,
-        contest: singleContest
+        contest: singleContest,
+        teamMembers: newTeamMembers,
+        isTeamLeader: newIsTeamLeader
       };
     });
+  }
+
+  const handleTeamMembersChange = (contestId: string, members: TeamMember[]) => {
+    setFormData(prev => ({
+      ...prev,
+      teamMembers: {
+        ...prev.teamMembers,
+        [contestId]: members
+      }
+    }))
   }
 
   // Update the handleSubmit function
@@ -186,6 +208,26 @@ export default function RegisterPage() {
       return
     }
 
+    // Validate team requirements
+    for (const contestId of formData.contests) {
+      const config = CONTEST_TEAM_CONFIGS[contestId as keyof typeof CONTEST_TEAM_CONFIGS];
+      if (config && config.required) {
+        const teamMembers = formData.teamMembers[contestId] || [];
+        const totalTeamSize = teamMembers.length + 1; // +1 for the team leader
+
+        if (totalTeamSize < config.min) {
+          setFormState({
+            isSubmitting: false,
+            isSuccess: false,
+            isError: true,
+            errorMessage: `${contestId.replace(/-/g, ' ')} requires a team of at least ${config.min} members. You currently have ${totalTeamSize} member(s).`,
+            alreadyRegistered: formState.alreadyRegistered,
+          })
+          return
+        }
+      }
+    }
+
     setFormState((prev) => ({
       ...prev,
       isSubmitting: true,
@@ -213,7 +255,9 @@ export default function RegisterPage() {
         department: "",
         contest: "",
         contests: [],
-        contestsData: {}
+        contestsData: {},
+        teamMembers: {},
+        isTeamLeader: {}
       })
 
       // Redirect to portal after successful registration
@@ -281,7 +325,9 @@ export default function RegisterPage() {
         department: "",
         contest: "",
         contests: [],
-        contestsData: {}
+        contestsData: {},
+        teamMembers: {},
+        isTeamLeader: {}
       })
 
       setFormState({
@@ -595,8 +641,8 @@ export default function RegisterPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {Object.entries(CONTEST_PRICES)
                             .filter(([contestId, details]) =>
-                              ['hackathon', 'robo-war', 'e-sports', 'ctf-cipher', 'in-it-to-win-it',
-                               'speed-coding-with-ai', 'devathon', 'treasure-hunt', '60-second-video'].includes(contestId))
+                              ['robo-war', 'e-sports', 'in-it-to-win-it',
+                               'speed-coding-with-ai', 'treasure-hunt', '60-second-video'].includes(contestId))
                             .map(([contestId, details]) => (
                             <div
                               key={contestId}
@@ -605,12 +651,12 @@ export default function RegisterPage() {
                                   ? 'bg-lightBlue/20 border-lightBlue'
                                   : 'bg-darkBlue/50 border-gray-700 hover:border-gray-500'
                               } ${
-                                ['ctf-cipher', 'e-sports'].includes(contestId)
+                                ['e-sports'].includes(contestId)
                                   ? 'opacity-60 cursor-not-allowed'
                                   : 'cursor-pointer'
                               }`}
                               onClick={() => {
-                                if (!['ctf-cipher', 'e-sports'].includes(contestId)) {
+                                if (!['e-sports'].includes(contestId)) {
                                   handleContestToggle(contestId);
                                 }
                               }}
@@ -622,9 +668,9 @@ export default function RegisterPage() {
                                   </div>
                                   <div className="text-sm text-gray-300">
                                     {details.amount === 0 ? 'Free' : `${details.amount} ${details.currency}`}
-                                    {['ctf-cipher', 'e-sports'].includes(contestId) && (
+                                    {['e-sports'].includes(contestId) && (
                                       <div className="text-amber-400 text-xs mt-1">
-                                        {contestId === 'ctf-cipher' ? 'Register at ciphers.cyberburgs.com' : 'Register via Google Form'}
+                                        Register via Google Form
                                       </div>
                                     )}
                                   </div>
@@ -726,6 +772,24 @@ export default function RegisterPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Team Registration Components */}
+                    {formData.contests && formData.contests.length > 0 && formData.contests.map(contestId => {
+                      const config = CONTEST_TEAM_CONFIGS[contestId as keyof typeof CONTEST_TEAM_CONFIGS];
+                      if (!config || config.max === 1) return null;
+
+                      return (
+                        <TeamRegistration
+                          key={contestId}
+                          contestId={contestId}
+                          teamMembers={formData.teamMembers[contestId] || []}
+                          onTeamMembersChange={(members) => handleTeamMembersChange(contestId, members)}
+                          maxTeamSize={config.max}
+                          minTeamSize={config.min}
+                          isTeamRequired={config.required}
+                        />
+                      );
+                    })}
 
                     {formData.contests && formData.contests.length > 0 && (
                       <div className="bg-darkBlue/50 border border-lightBlue/20 rounded-md p-4 mt-4">
