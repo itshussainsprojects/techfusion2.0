@@ -90,7 +90,7 @@ export default function Home() {
     },
     {
       title: "Speed Coding with AI",
-      description: "Rapid problem-solving coding contest with AI tools - Rs. 400",
+      description: "Develop projects using AI tools like ChatGPT, DeepSeek, Grok, Qwen & Replit - Rs. 400",
       icon: <Code className="h-6 w-6" />,
       color: "from-cyan-500 to-blue-600",
       price: 400,
