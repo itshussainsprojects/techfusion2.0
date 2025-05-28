@@ -9,25 +9,13 @@ const events = [
   {
     name: "Suffiyana 2.0",
     description: "Experience the magic of Sufi musical performances and Qawalli. Featuring renowned artists performing traditional Sufi music that will touch your soul and connect you to your cultural roots.",
-    date: "June 27, 2023",
-    time: "7:00 PM - 10:00 PM",
+    date: "June 3, 2025",
+    time: "6:00 PM - 9:00 PM",
     location: "University Ground",
     capacity: "500 attendees",
     image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
     registerLink: "/register",
     color: "from-purple-600 to-pink-500",
-    price: "Rs. 700"
-  },
-  {
-    name: "Sham-e-Sukhan",
-    description: "Join us for a soulful evening of poetry (Sham-e-Sukhan). A celebration of artistic expression and creative talent featuring well-known poets that will revive our literary heritage.",
-    date: "June 29, 2023",
-    time: "6:30 PM - 9:30 PM",
-    location: "Open Air Theater",
-    capacity: "300 attendees",
-    image: "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
-    registerLink: "/register",
-    color: "from-amber-500 to-red-600",
     price: "Rs. 700"
   }
 ]

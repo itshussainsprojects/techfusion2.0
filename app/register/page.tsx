@@ -104,7 +104,6 @@ export default function RegisterPage() {
     "women-engineering-seminar": { amount: 0, currency: "PKR", description: "Women in Engineering Seminar - Free" },
     "ai-seminar": { amount: 0, currency: "PKR", description: "AI Seminar - Free" },
     "suffiyana": { amount: 700, currency: "PKR", description: "Suffiyana 2.0 - Cultural Event" },
-    "sham-e-sukhan": { amount: 700, currency: "PKR", description: "Sham-e-Sukhan - Cultural Event" },
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -737,7 +736,7 @@ export default function RegisterPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                           {Object.entries(CONTEST_PRICES)
                             .filter(([contestId, details]) =>
-                              ['suffiyana', 'sham-e-sukhan'].includes(contestId))
+                              ['suffiyana'].includes(contestId))
                             .map(([contestId, details]) => (
                             <div
                               key={contestId}

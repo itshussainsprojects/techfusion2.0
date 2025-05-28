@@ -8,7 +8,7 @@ import Link from "next/link"
 const seminars = [
   {
     name: "Women in Engineering Seminar",
-    date: "June 27, 2023",
+    date: "June 3, 2025",
     time: "10:00 AM - 1:00 PM",
     location: "Main Auditorium",
     image: "https://images.unsplash.com/photo-1573164713988-8665fc963095?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -16,14 +16,14 @@ const seminars = [
     speakers: [
       "Dr. Amina Khan - Electrical Engineering Professor",
       "Eng. Fatima Ahmed - Senior Software Engineer at Systems Limited",
-     
+
     ],
     registerLink: "/register",
     price: "Free"
   },
   {
     name: "Artificial Intelligence Seminar",
-    date: "June 27, 2023",
+    date: "June 4, 2025",
     time: "2:00 PM - 5:00 PM",
     location: "Computer Science Building, Room 201",
     image: "https://images.unsplash.com/photo-1591453089816-0fbb971b454c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -38,7 +38,7 @@ const seminars = [
   },
   {
     name: "Eye Sight Camp",
-    date: "June 29, 2023",
+    date: "June 4, 2025",
     time: "9:00 AM - 4:00 PM",
     location: "University Health Center",
     image: "https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",

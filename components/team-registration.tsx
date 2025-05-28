@@ -38,12 +38,11 @@ const CONTEST_TEAM_CONFIGS = {
   "women-engineering-seminar": { min: 1, max: 1, required: false },
   "ai-seminar": { min: 1, max: 1, required: false },
   "suffiyana": { min: 1, max: 1, required: false },
-  "sham-e-sukhan": { min: 1, max: 1, required: false },
 }
 
-export function TeamRegistration({ 
-  contestId, 
-  teamMembers, 
+export function TeamRegistration({
+  contestId,
+  teamMembers,
   onTeamMembersChange,
   maxTeamSize,
   minTeamSize,
@@ -57,19 +56,19 @@ export function TeamRegistration({
     role: ""
   })
 
-  const config = CONTEST_TEAM_CONFIGS[contestId as keyof typeof CONTEST_TEAM_CONFIGS] || 
+  const config = CONTEST_TEAM_CONFIGS[contestId as keyof typeof CONTEST_TEAM_CONFIGS] ||
     { min: minTeamSize, max: maxTeamSize, required: isTeamRequired }
 
   const addTeamMember = () => {
     if (teamMembers.length >= config.max) return
-    
+
     if (!newMember.name || !newMember.email || !newMember.rollNumber || !newMember.department) {
       return
     }
 
     const updatedMembers = [...teamMembers, { ...newMember }]
     onTeamMembersChange(updatedMembers)
-    
+
     // Reset form
     setNewMember({
       name: "",
@@ -86,7 +85,7 @@ export function TeamRegistration({
   }
 
   const updateTeamMember = (index: number, field: keyof TeamMember, value: string) => {
-    const updatedMembers = teamMembers.map((member, i) => 
+    const updatedMembers = teamMembers.map((member, i) =>
       i === index ? { ...member, [field]: value } : member
     )
     onTeamMembersChange(updatedMembers)
@@ -139,7 +138,7 @@ export function TeamRegistration({
                   <Trash2 className="h-4 w-4 text-red-500" />
                 </Button>
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
                   <Label className="text-gray-300 text-xs">Name</Label>
@@ -194,7 +193,7 @@ export function TeamRegistration({
               <Plus className="h-4 w-4 mr-2 text-lightBlue" />
               Add Team Member
             </h4>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
               <div>
                 <Label className="text-gray-300 text-xs">Name</Label>
@@ -234,7 +233,7 @@ export function TeamRegistration({
                 />
               </div>
             </div>
-            
+
             <Button
               type="button"
               onClick={addTeamMember}
