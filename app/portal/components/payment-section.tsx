@@ -323,7 +323,7 @@ export default function PaymentSection({ participant, reloadParticipant, payment
       <CardHeader>
         <CardTitle className="text-xl md:text-2xl font-bold text-white">Payment Details</CardTitle>
         <CardDescription className="text-gray-300">
-        <span>JazzCash: +92 3319215005 - Easypaisa: +92 3319215005</span>
+        <span>EasyPaisa: +92 3319215005 - Sharaf Ahmed</span>
         <br></br>
           {safePaymentDetails.description}: {safePaymentDetails.amount} {safePaymentDetails.currency}
         </CardDescription>
