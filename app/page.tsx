@@ -303,46 +303,9 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1, delay: 0.1 }}
             className="mb-6 relative inline-block mt-8 sm:mt-0"
-            onMouseEnter={() => setIsHeroInView(true)}
-            onMouseLeave={() => setIsHeroInView(false)}
           >
-            {/* Multiple animated background layers */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg blur-xl opacity-75 animate-pulse"></div>
-            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-500 rounded-lg blur-lg opacity-50 animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-
-            {/* Sparkle effects */}
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              animate={{
-                opacity: [0, 1, 0],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                repeatDelay: 1
-              }}
-            >
-              <Sparkles className="absolute top-2 left-4 h-6 w-6 text-yellow-400" />
-              <Sparkles className="absolute bottom-4 right-8 h-4 w-4 text-blue-400" />
-              <Sparkles className="absolute top-1/2 right-4 h-5 w-5 text-purple-400" />
-              <Star className="absolute top-8 right-12 h-3 w-3 text-pink-400" />
-              <Star className="absolute bottom-8 left-8 h-4 w-4 text-cyan-400" />
-            </motion.div>
-
             <motion.h1
-              className="relative text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold px-4 sm:px-8 py-3 sm:py-4"
-              animate={{
-                textShadow: [
-                  "0 0 20px rgba(59, 130, 246, 0.5)",
-                  "0 0 40px rgba(147, 51, 234, 0.5)",
-                  "0 0 20px rgba(59, 130, 246, 0.5)"
-                ]
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
+              className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold px-4 sm:px-8 py-3 sm:py-4"
             >
               <motion.span
                 className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-lightBlue to-purple-400"
@@ -393,14 +356,13 @@ export default function Home() {
             >
               <Button
                 onClick={scrollToRegistration}
-                className="bg-gradient-to-r from-blue-600 to-lightBlue hover:from-blue-700 hover:to-lightBlue/90 text-white px-8 py-6 text-lg rounded-md shadow-lg hover:shadow-xl transition-all duration-300 relative group overflow-hidden"
+                className="bg-gradient-to-r from-blue-600 to-lightBlue hover:from-blue-700 hover:to-lightBlue/90 text-white px-8 py-6 text-lg rounded-md shadow-lg hover:shadow-xl transition-all duration-300 relative group"
               >
-                <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-lightBlue to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"></span>
                 <motion.span
-                  className="relative flex items-center"
+                  className="flex items-center"
                   whileHover={{ x: 2 }}
                 >
-                  <Sparkles className="h-5 w-5 mr-2 group-hover:animate-spin" />
+                  <Sparkles className="h-5 w-5 mr-2" />
                   Register Now
                   <ArrowRight className="h-5 w-5 ml-2 group-hover:translate-x-1 transition-transform" />
                 </motion.span>
@@ -414,14 +376,13 @@ export default function Home() {
               <Link href="#events">
                 <Button
                   variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-md transition-all duration-300 relative group overflow-hidden"
+                  className="border-white/30 text-white hover:bg-white/10 px-8 py-6 text-lg rounded-md transition-all duration-300 group"
                 >
-                  <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                   <motion.span
-                    className="relative flex items-center"
+                    className="flex items-center"
                     whileHover={{ x: 2 }}
                   >
-                    <Eye className="h-5 w-5 mr-2 group-hover:animate-pulse" />
+                    <Eye className="h-5 w-5 mr-2" />
                     Explore Events
                     <Play className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                   </motion.span>
@@ -568,11 +529,11 @@ export default function Home() {
                 onHoverEnd={() => setActiveCard(null)}
                 className="relative"
               >
-                {/* Glowing border effect on hover */}
+                {/* Subtle border effect on hover */}
                 <motion.div
-                  className="absolute -inset-0.5 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-lg opacity-0 blur-sm"
+                  className="absolute -inset-0.5 bg-gradient-to-r from-blue-600/30 via-purple-600/30 to-pink-600/30 rounded-lg opacity-0"
                   animate={{
-                    opacity: activeCard === index ? 0.7 : 0,
+                    opacity: activeCard === index ? 0.4 : 0,
                   }}
                   transition={{ duration: 0.3 }}
                 />
@@ -635,11 +596,10 @@ export default function Home() {
                         <Link href="https://forms.gle/gWZ7YWMZubRyHhySA" target="_blank" rel="noopener noreferrer" className="w-full">
                           <Button
                             variant="outline"
-                            className="w-full border-lightBlue text-lightBlue hover:bg-lightBlue hover:text-white transition-all duration-300 relative group overflow-hidden"
+                            className="w-full border-lightBlue text-lightBlue hover:bg-lightBlue hover:text-white transition-all duration-300 group"
                           >
-                            <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-lightBlue/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                            <span className="relative flex items-center justify-center">
-                              <Target className="h-4 w-4 mr-2 group-hover:animate-pulse" />
+                            <span className="flex items-center justify-center">
+                              <Target className="h-4 w-4 mr-2" />
                               Register on Google Forms
                               <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                             </span>
@@ -649,11 +609,10 @@ export default function Home() {
                         <Link href="/register" className="w-full">
                           <Button
                             variant="outline"
-                            className="w-full border-lightBlue text-lightBlue hover:bg-lightBlue hover:text-white transition-all duration-300 relative group overflow-hidden"
+                            className="w-full border-lightBlue text-lightBlue hover:bg-lightBlue hover:text-white transition-all duration-300 group"
                           >
-                            <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-lightBlue/20 to-blue-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                            <span className="relative flex items-center justify-center">
-                              <Sparkles className="h-4 w-4 mr-2 group-hover:animate-spin" />
+                            <span className="flex items-center justify-center">
+                              <Sparkles className="h-4 w-4 mr-2" />
                               Register Now
                               <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                             </span>
