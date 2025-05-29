@@ -74,7 +74,7 @@ const contestDetails = {
     location: "University Grounds",
     teamSize: "3-5 members",
     duration: "2 days",
-    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize", "Exciting Gifts for All Participants"],
+    prizes: ["Exciting Prizes for All Participants"],
     requirements: [
       "Comfortable clothing and footwear",
       "Team spirit and enthusiasm",
@@ -123,7 +123,7 @@ const contestDetails = {
     location: "University Campus",
     teamSize: "3-5 members",
     duration: "6 hours",
-    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize", "Winning Prizes & Exciting Gifts"],
+    prizes: ["5,000 PKR Winning Prize", "Exciting Gifts for All Participants"],
     requirements: [
       "Comfortable clothing and footwear",
       "Smartphone with camera",
@@ -147,7 +147,7 @@ const contestDetails = {
     location: "University Campus",
     teamSize: "1-2 members",
     duration: "2 days",
-    prizes: ["Best Video Award", "Most Creative Award", "People's Choice Award"],
+    prizes: ["Exciting Prizes for All Participants"],
     requirements: [
       "Smartphone or camera for video recording",
       "Basic video editing skills",

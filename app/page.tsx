@@ -86,7 +86,7 @@ export default function Home() {
       icon: <Rocket className="h-6 w-6" />,
       color: "from-yellow-500 to-amber-600",
       price: 500,
-      prize: "Rs. 5,000 + Exciting Gifts"
+      prize: "Exciting Prizes"
     },
     {
       title: "Speed Coding with AI",
@@ -103,7 +103,7 @@ export default function Home() {
       icon: <MapPin className="h-6 w-6" />,
       color: "from-amber-500 to-orange-600",
       price: 1000,
-      prize: "Winning Prizes & Exciting Gifts"
+      prize: "Rs. 5,000 Winning Prize"
     },
     {
       title: "60 Second Video",
@@ -111,7 +111,7 @@ export default function Home() {
       icon: <Video className="h-6 w-6" />,
       color: "from-pink-500 to-rose-600",
       price: 0,
-      prize: "Recognition"
+      prize: "Exciting Prizes"
     },
   ]
 
