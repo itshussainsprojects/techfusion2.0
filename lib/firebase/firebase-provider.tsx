@@ -357,6 +357,7 @@ export type ParticipantData = {
   email: string
   rollNumber: string
   department: string
+  cnic?: string // CNIC field for Suffiyana registration
   // For backward compatibility
   contest?: string
   // New fields for multi-contest support
@@ -535,11 +536,31 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
     try {
       const participantsRef = collection(db, "participants")
       const snapshot = await getDocs(participantsRef)
-      return snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-        timestamp: doc.data().timestamp?.toDate(),
-      })) as ParticipantData[]
+      return snapshot.docs.map((doc) => {
+        const data = doc.data()
+
+        // Handle both old and new data structures
+        const participantData: ParticipantData = {
+          id: doc.id,
+          name: data.name,
+          email: data.email,
+          rollNumber: data.rollNumber,
+          department: data.department,
+          cnic: data.cnic, // Include CNIC field
+          contest: data.contest || (data.contests && data.contests.length > 0 ? data.contests[0] : ""),
+          contests: data.contests || (data.contest ? [data.contest] : []),
+          contestsData: data.contestsData || {},
+          timestamp: data.timestamp?.toDate(),
+          paymentStatus: data.paymentStatus,
+          approvalStatus: data.approvalStatus || 'pending',
+          rejectionReason: data.rejectionReason,
+          // Team-related fields
+          teamMembers: data.teamMembers || {},
+          isTeamLeader: data.isTeamLeader || {},
+        };
+
+        return participantData;
+      })
     } catch (error) {
       console.error("Error getting participants:", error)
       throw error
@@ -644,6 +665,7 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
         email: data.email,
         rollNumber: data.rollNumber,
         department: data.department,
+        cnic: data.cnic, // Include CNIC field
         contest: data.contest || (data.contests && data.contests.length > 0 ? data.contests[0] : ""),
         contests: data.contests || (data.contest ? [data.contest] : []),
         contestsData: data.contestsData || {},

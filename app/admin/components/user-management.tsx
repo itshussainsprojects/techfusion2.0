@@ -29,6 +29,7 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
   const [editingName, setEditingName] = useState<string>('')
   const [editingEmail, setEditingEmail] = useState<string>('')
   const [editingDepartment, setEditingDepartment] = useState<string>('')
+  const [editingCnic, setEditingCnic] = useState<string>('')
   const [editingContest, setEditingContest] = useState<string>('')
   const [editingContests, setEditingContests] = useState<string[]>([])
   const [editingContestsData, setEditingContestsData] = useState<Record<string, any>>({})
@@ -48,6 +49,7 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
     setEditingName(participant.name || '')
     setEditingEmail(participant.email || '')
     setEditingDepartment(participant.department || '')
+    setEditingCnic(participant.cnic || '')
     setEditingContest(participant.contest || '')
     setEditingContests(participant.contests || [])
     setEditingContestsData(participant.contestsData || {})
@@ -81,6 +83,7 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
         email: editingEmail,
         rollNumber: editingRollNumber,
         department: editingDepartment,
+        cnic: editingCnic,
         contest: editingContest,
         contests: editingContests,
         contestsData: editingContestsData,
@@ -96,6 +99,7 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
       setEditingName('')
       setEditingEmail('')
       setEditingDepartment('')
+      setEditingCnic('')
       setEditingContest('')
       setEditingContests([])
       setEditingContestsData({})
@@ -183,6 +187,7 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
                   <TableHead className="text-gray-300">Email</TableHead>
                   <TableHead className="text-gray-300">Roll Number</TableHead>
                   <TableHead className="text-gray-300">Department</TableHead>
+                  <TableHead className="text-gray-300">CNIC</TableHead>
                   <TableHead className="text-gray-300">Contest</TableHead>
                   <TableHead className="text-gray-300">Team Members</TableHead>
                   <TableHead className="text-gray-300">Payment Status</TableHead>
@@ -210,6 +215,13 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
                     <TableCell className="text-white">{participant.email}</TableCell>
                     <TableCell className="text-white">{participant.rollNumber}</TableCell>
                     <TableCell className="text-white">{participant.department}</TableCell>
+                    <TableCell className="text-white">
+                      {participant.cnic ? (
+                        <span className="text-white">{participant.cnic}</span>
+                      ) : (
+                        <span className="text-gray-400 text-sm">Not provided</span>
+                      )}
+                    </TableCell>
                     <TableCell className="text-white">
                       {participant.contests && participant.contests.length > 0 ? (
                         <div className="flex flex-wrap gap-1">
@@ -374,6 +386,28 @@ export function UserManagement({ participants, isLoading, onUpdate, onDelete }: 
                                     className="bg-darkBlue/50 border-gray-700 text-white"
                                   />
                                 </div>
+                              </div>
+
+                              {/* CNIC field - shown for all participants but especially important for Suffiyana */}
+                              <div className="space-y-2">
+                                <Label htmlFor="cnic" className="text-white">
+                                  CNIC (Pakistani National ID)
+                                  {editingContests && editingContests.includes('suffiyana') && (
+                                    <span className="text-red-400 ml-1">*</span>
+                                  )}
+                                </Label>
+                                <Input
+                                  id="cnic"
+                                  value={editingCnic || ''}
+                                  onChange={(e) => setEditingCnic(e.target.value)}
+                                  placeholder="12345-1234567-1"
+                                  className="bg-darkBlue/50 border-gray-700 text-white"
+                                />
+                                {editingContests && editingContests.includes('suffiyana') && (
+                                  <p className="text-xs text-yellow-400">
+                                    CNIC is required for Suffiyana 2.0 registration
+                                  </p>
+                                )}
                               </div>
 
                               <div className="space-y-2">
