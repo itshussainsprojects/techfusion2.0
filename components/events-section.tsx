@@ -11,12 +11,12 @@ const events = [
     description: "Experience the magic of Sufi musical performances and Qawalli. Featuring renowned artists performing traditional Sufi music that will touch your soul and connect you to your cultural roots.",
     date: "June 3, 2025",
     time: "6:00 PM - 9:00 PM",
-    location: "University Ground",
+    location: "University Location (To be confirmed later)",
     capacity: "500 attendees",
     image: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80",
     registerLink: "/register",
     color: "from-purple-600 to-pink-500",
-    price: "Rs. 700"
+    price: "Rs. 800"
   }
 ]
 

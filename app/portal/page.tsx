@@ -19,22 +19,24 @@ import { toast } from "sonner"
 const contestDetails = {
   "robo-war": {
     title: "Robo War",
-    description: "A robot battle showcasing engineering and innovation.",
+    description: "A robot battle showcasing engineering and innovation - Rs. 4,500",
     date: "June 3-4, 2025",
     location: "Engineering Building, Room 305",
     teamSize: "2-3 members",
     duration: "2 days",
     prizes: ["25,000 PKR First Prize", "15,000 PKR Second Prize", "10,000 PKR Third Prize"],
     requirements: [
+      "Registration fee: Rs. 4,500",
       "Basic knowledge of robotics",
       "Familiarity with Arduino or Raspberry Pi",
       "Programming skills (Python or C++)",
       "Tools for assembly and testing",
     ],
     schedule: [
-      { time: "June 3, 9:00 AM", event: "Registration & Equipment Check" },
-      { time: "June 3, 10:00 AM", event: "Rules Briefing & Challenge Announcement" },
-      { time: "June 3, 11:00 AM", event: "Design & Build Phase Begins" },
+      { time: "June 3, 10:00 AM", event: "Opening Ceremony" },
+      { time: "June 3, 10:30 AM", event: "Registration & Equipment Check" },
+      { time: "June 3, 11:00 AM", event: "Rules Briefing & Challenge Announcement" },
+      { time: "June 3, 11:30 AM", event: "Design & Build Phase Begins" },
       { time: "June 4, 10:00 AM", event: "Testing Phase" },
       { time: "June 4, 2:00 PM", event: "Final Competition" },
       { time: "June 4, 5:00 PM", event: "Awards Ceremony" },
@@ -72,7 +74,7 @@ const contestDetails = {
     location: "University Grounds",
     teamSize: "3-5 members",
     duration: "2 days",
-    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize"],
+    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize", "Exciting Gifts for All Participants"],
     requirements: [
       "Comfortable clothing and footwear",
       "Team spirit and enthusiasm",
@@ -81,7 +83,7 @@ const contestDetails = {
     ],
     schedule: [
       { time: "June 3, 9:00 AM", event: "Registration & Team Formation" },
-      { time: "June 3, 10:00 AM", event: "Games Briefing" },
+      { time: "June 3, 10:00 AM", event: "Opening Ceremony & Games Briefing" },
       { time: "June 3, 10:30 AM", event: "Activities Begin" },
       { time: "June 3, 12:30 PM", event: "Lunch Break" },
       { time: "June 3, 1:30 PM", event: "Activities Resume" },
@@ -121,7 +123,7 @@ const contestDetails = {
     location: "University Campus",
     teamSize: "3-5 members",
     duration: "6 hours",
-    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize"],
+    prizes: ["5,000 PKR First Prize", "3,000 PKR Second Prize", "2,000 PKR Third Prize", "Winning Prizes & Exciting Gifts"],
     requirements: [
       "Comfortable clothing and footwear",
       "Smartphone with camera",
@@ -162,18 +164,20 @@ const contestDetails = {
   },
   "suffiyana": {
     title: "Suffiyana 2.0",
-    description: "Sufi musical performances and Qawalli featuring renowned artists - Rs. 700",
+    description: "Sufi musical performances and Qawalli featuring renowned artists - Rs. 800",
     date: "June 3, 2025",
-    location: "University Ground",
+    location: "University Location (To be confirmed later)",
     teamSize: "N/A",
     duration: "3 hours",
     prizes: ["Cultural Experience"],
     requirements: [
-      "Registration fee: Rs. 700",
+      "Registration fee: Rs. 800",
+      "CNIC required for registration",
       "Respect for cultural performances",
       "Punctuality",
     ],
     schedule: [
+      { time: "June 3, 10:00 AM", event: "Opening Ceremony" },
       { time: "June 3, 5:30 PM", event: "Doors Open" },
       { time: "June 3, 6:00 PM", event: "Welcome Address" },
       { time: "June 3, 6:15 PM", event: "First Performance" },
@@ -252,7 +256,7 @@ const contestDetails = {
 
 const CONTEST_PRICES = {
   "robo-war": {
-    amount: 10000,
+    amount: 4500,
     currency: 'PKR',
     description: 'Robo War Competition Fee'
   },
@@ -299,7 +303,7 @@ const CONTEST_PRICES = {
     description: 'AI Seminar - Free'
   },
   "suffiyana": {
-    amount: 700,
+    amount: 800,
     currency: 'PKR',
     description: 'Suffiyana 2.0 - Cultural Event'
   }

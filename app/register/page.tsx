@@ -25,6 +25,7 @@ export default function RegisterPage() {
     email: "",
     rollNumber: "",
     department: "",
+    cnic: "", // CNIC field for Suffiyana registration
     contest: "", // Keep for backward compatibility
     contests: [] as string[],
     contestsData: {} as Record<string, any>,
@@ -94,7 +95,7 @@ export default function RegisterPage() {
 
   // Contest prices for calculating total
   const CONTEST_PRICES = {
-    "robo-war": { amount: 10000, currency: "PKR", description: "Robo War Competition Fee" },
+    "robo-war": { amount: 4500, currency: "PKR", description: "Robo War Competition Fee" },
     "e-sports": { amount: 1600, currency: "PKR", description: "E-Sports Tournament Fee" },
     "in-it-to-win-it": { amount: 500, currency: "PKR", description: "In It to Win It Activities Fee" },
     "speed-coding-with-ai": { amount: 400, currency: "PKR", description: "Speed Coding with AI Competition Fee" },
@@ -103,7 +104,7 @@ export default function RegisterPage() {
     "eye-sight-camp": { amount: 0, currency: "PKR", description: "Eye Sight Camp - Free" },
     "women-engineering-seminar": { amount: 0, currency: "PKR", description: "Women in Engineering Seminar - Free" },
     "ai-seminar": { amount: 0, currency: "PKR", description: "AI Seminar - Free" },
-    "suffiyana": { amount: 700, currency: "PKR", description: "Suffiyana 2.0 - Cultural Event" },
+    "suffiyana": { amount: 800, currency: "PKR", description: "Suffiyana 2.0 - Cultural Event" },
   };
 
   const handleSelectChange = (name: string, value: string) => {
@@ -207,6 +208,33 @@ export default function RegisterPage() {
       return
     }
 
+    // Validate CNIC for Suffiyana registration
+    if (formData.contests.includes('suffiyana') && !formData.cnic) {
+      setFormState({
+        isSubmitting: false,
+        isSuccess: false,
+        isError: true,
+        errorMessage: "CNIC is required for Suffiyana 2.0 registration",
+        alreadyRegistered: formState.alreadyRegistered,
+      })
+      return
+    }
+
+    // Validate CNIC format (Pakistani CNIC: 5-7-1 format)
+    if (formData.contests.includes('suffiyana') && formData.cnic) {
+      const cnicPattern = /^\d{5}-\d{7}-\d{1}$/
+      if (!cnicPattern.test(formData.cnic)) {
+        setFormState({
+          isSubmitting: false,
+          isSuccess: false,
+          isError: true,
+          errorMessage: "Please enter a valid Pakistani CNIC (format: 12345-1234567-1)",
+          alreadyRegistered: formState.alreadyRegistered,
+        })
+        return
+      }
+    }
+
     // Validate team requirements
     for (const contestId of formData.contests) {
       const config = CONTEST_TEAM_CONFIGS[contestId as keyof typeof CONTEST_TEAM_CONFIGS];
@@ -252,6 +280,7 @@ export default function RegisterPage() {
         email: user?.email || "",
         rollNumber: "",
         department: "",
+        cnic: "",
         contest: "",
         contests: [],
         contestsData: {},
@@ -322,6 +351,7 @@ export default function RegisterPage() {
         email: emailRegister.email,
         rollNumber: "",
         department: "",
+        cnic: "",
         contest: "",
         contests: [],
         contestsData: {},
@@ -628,6 +658,27 @@ export default function RegisterPage() {
                     />
                   </div>
 
+                  {/* CNIC field - shown only when Suffiyana is selected */}
+                  {formData.contests && formData.contests.includes('suffiyana') && (
+                    <div className="space-y-2">
+                      <Label htmlFor="cnic" className="text-white">
+                        CNIC (Pakistani National ID) <span className="text-red-400">*</span>
+                      </Label>
+                      <Input
+                        id="cnic"
+                        name="cnic"
+                        value={formData.cnic}
+                        onChange={handleInputChange}
+                        placeholder="12345-1234567-1"
+                        className="bg-darkBlue/50 border-gray-700 text-white"
+                        required
+                      />
+                      <p className="text-xs text-gray-400">
+                        Required for Suffiyana 2.0 registration. Format: 12345-1234567-1
+                      </p>
+                    </div>
+                  )}
+
                   <div className="space-y-4">
                     <div>
                       <Label className="text-white mb-2 block">
@@ -753,7 +804,7 @@ export default function RegisterPage() {
                                     {contestId.replace(/-/g, ' ')}
                                   </div>
                                   <div className="text-sm text-green-400 font-medium">
-                                    700 PKR
+                                    800 PKR
                                   </div>
                                 </div>
                                 <div className={`h-5 w-5 rounded-full border ${

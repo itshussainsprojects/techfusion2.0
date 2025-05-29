@@ -65,10 +65,10 @@ export default function Home() {
   const contests = [
     {
       title: "Robo War",
-      description: "A robot battle showcasing engineering and innovation - Rs. 10,000",
+      description: "A robot battle showcasing engineering and innovation - Rs. 4,500",
       icon: <Cpu className="h-6 w-6" />,
       color: "from-green-500 to-teal-600",
-      price: 10000,
+      price: 4500,
       prize: "Rs. 25,000"
     },
     {
@@ -86,7 +86,7 @@ export default function Home() {
       icon: <Rocket className="h-6 w-6" />,
       color: "from-yellow-500 to-amber-600",
       price: 500,
-      prize: "Rs. 5,000"
+      prize: "Rs. 5,000 + Exciting Gifts"
     },
     {
       title: "Speed Coding with AI",
@@ -103,7 +103,7 @@ export default function Home() {
       icon: <MapPin className="h-6 w-6" />,
       color: "from-amber-500 to-orange-600",
       price: 1000,
-      prize: "Exciting Prizes"
+      prize: "Winning Prizes & Exciting Gifts"
     },
     {
       title: "60 Second Video",
@@ -131,7 +131,7 @@ export default function Home() {
     {
       date: "June 3, 2025",
       title: "Opening Ceremony",
-      description: "Official kickoff of Tech Fusion 2.0 with keynote speakers at 9:00 AM",
+      description: "Official kickoff of Tech Fusion 2.0 with keynote speakers at 10:00 AM",
     },
     {
       date: "June 3-4, 2025",
