@@ -75,13 +75,14 @@ import { useFirebase } from '@/lib/firebase/firebase-provider'
 import { UserManagement } from './components/user-management'
 import { PaymentManagement } from './components/payment-management'
 import { QuestionManagement } from './components/question-management'
+import SubmissionManagement from './components/submission-management' // Added import
 import { Button } from '@/components/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ParticipantData } from '@/lib/firebase/firebase-provider' // Ensure correct import
 
 export default function AdminPage() {
   const { user, signOut, getParticipants, updateParticipant, deleteParticipant } = useFirebase()
-  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'questions'>('users') // Type for activeTab
+  const [activeTab, setActiveTab] = useState<'users' | 'payments' | 'questions' | 'submissions'>('users') // Added 'submissions' to type
   const [participants, setParticipants] = useState<ParticipantData[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
@@ -134,10 +135,11 @@ export default function AdminPage() {
       </div>
 
       <Tabs defaultValue="users" className="mb-8">
-        <TabsList className="grid w-full max-w-md mx-auto grid-cols-3">
+        <TabsList className="grid w-full max-w-lg mx-auto grid-cols-4"> {/* Adjusted grid-cols and max-w */}
           <TabsTrigger value="users" onClick={() => setActiveTab('users')}>User Management</TabsTrigger>
           <TabsTrigger value="payments" onClick={() => setActiveTab('payments')}>Payment Management</TabsTrigger>
           <TabsTrigger value="questions" onClick={() => setActiveTab('questions')}>Contest Questions</TabsTrigger>
+          <TabsTrigger value="submissions" onClick={() => setActiveTab('submissions')}>Submissions</TabsTrigger> {/* Added Submissions Tab */}
         </TabsList>
 
         <TabsContent value="users" className="mt-6">
@@ -155,6 +157,10 @@ export default function AdminPage() {
 
         <TabsContent value="questions" className="mt-6">
           <QuestionManagement isLoading={isLoading} />
+        </TabsContent>
+
+        <TabsContent value="submissions" className="mt-6"> {/* Added Submissions Content */}
+          <SubmissionManagement />
         </TabsContent>
       </Tabs>
     </div>

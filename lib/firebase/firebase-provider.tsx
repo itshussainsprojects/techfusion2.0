@@ -288,7 +288,7 @@ import {
   updateProfile,
   type User,
 } from "firebase/auth"
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, getDoc, orderBy, limit } from "firebase/firestore"
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, getDoc, orderBy, limit, onSnapshot, Timestamp as FirestoreTimestamp } from "firebase/firestore" // Added onSnapshot and FirestoreTimestamp
 import { ContestQuestion, QuestionSubmission } from "@/lib/types/question"
 import { firebaseConfig } from "./firebase-config"
 
@@ -402,6 +402,8 @@ type FirebaseContextType = {
   submitAnswer: (data: QuestionSubmission) => Promise<string>
   getSubmissions: (questionId?: string, participantId?: string) => Promise<QuestionSubmission[]>
   updateSubmission: (id: string, data: Partial<QuestionSubmission>) => Promise<void>
+  clearAllSubmissions: () => Promise<void>
+  onNewSubmission: (callback: (submission: QuestionSubmission) => void) => (() => void) // Added for real-time updates
 }
 
 // List of admin emails
@@ -815,20 +817,20 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
           let overallStatus = 'not paid';
 
           // Check if any contests are in 'partial' status
-          const anyPartial = allContests.some(contest =>
+          const anyPartial = allContests.some((contest: string) =>
             contestsData[contest] && contestsData[contest].paymentStatus === 'partial'
           );
 
           // Check if all contests are in 'paid' status
-          const allPaid = allContests.every(contest =>
+          const allPaid = allContests.every((contest: string) =>
             contestsData[contest] && contestsData[contest].paymentStatus === 'paid'
           );
 
           // Determine overall status
           if (allPaid) {
             overallStatus = 'paid';
-          } else if (anyPartial || allContests.some(contest =>
-            contestsData[contest] && contestsData[contest].paymentStatus === 'paid'
+          } else if (anyPartial || allContests.some((contest: string) => // This line was checking for 'paid' again, should check for 'not paid' or 'partial' to set overall 'partial'
+            contestsData[contest] && (contestsData[contest].paymentStatus === 'partial' || !contestsData[contest].paymentStatus) // Corrected logic for partial
           )) {
             overallStatus = 'partial';
           }
@@ -1261,6 +1263,66 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
     }
   }
 
+  const clearAllSubmissions = async () => {
+    if (!db) throw new Error("Firebase Firestore not initialized")
+    if (!isAdmin) throw new Error("Only admins can clear submissions")
+
+    try {
+      const submissionsRef = collection(db, "submissions")
+      const snapshot = await getDocs(submissionsRef)
+
+      const deletePromises = snapshot.docs.map(doc => deleteDoc(doc.ref))
+      await Promise.all(deletePromises)
+
+      console.log(`Cleared ${snapshot.docs.length} submissions`)
+    } catch (error) {
+      console.error("Error clearing submissions:", error)
+      throw error
+    }
+  }
+
+  const onNewSubmission = (callback: (submission: QuestionSubmission) => void) => {
+    if (!db) {
+      console.error("Firebase Firestore not initialized for onNewSubmission")
+      return () => {} // Return an empty unsubscribe function
+    }
+
+    const submissionsRef = collection(db, "submissions")
+    // Capture the time when the listener is attached.
+    // We only want to react to submissions created at or after this time.
+    const listenerAttachTime = FirestoreTimestamp.now();
+
+    // Query for submissions ordered by their creation time.
+    // We will filter for 'added' changes that are at or after listenerAttachTime.
+    const q = query(submissionsRef, orderBy("submittedAt", "asc"));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          const submissionDoc = change.doc;
+          const submissionTimestamp = submissionDoc.data().submittedAt as FirestoreTimestamp;
+
+          // Ensure we only process submissions that occurred at or after the listener was attached.
+          // This helps avoid processing historical data as "new" if the orderBy query initially
+          // brings in older documents before catching up to real-time.
+          if (submissionTimestamp && submissionTimestamp.toMillis() >= listenerAttachTime.toMillis()) {
+            const submissionData = {
+              id: submissionDoc.id,
+              ...submissionDoc.data(),
+              submittedAt: submissionTimestamp.toDate(),
+            } as QuestionSubmission;
+            console.log("Processing new submission via listener:", submissionData);
+            callback(submissionData);
+          }
+        }
+      })
+    }, (error) => {
+      console.error("Error in onNewSubmission listener:", error)
+    })
+
+    return unsubscribe // Return the unsubscribe function
+  }
+
   const value = {
     user,
     loading,
@@ -1288,7 +1350,9 @@ export const FirebaseProvider = ({ children }: { children: React.ReactNode }) =>
     // Question submissions
     submitAnswer,
     getSubmissions,
-    updateSubmission
+    updateSubmission,
+    clearAllSubmissions,
+    onNewSubmission // Added to context
   }
 
   return <FirebaseContext.Provider value={value}>{children}</FirebaseContext.Provider>

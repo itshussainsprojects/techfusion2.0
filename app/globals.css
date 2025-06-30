@@ -174,6 +174,41 @@
   }
 }
 
+@keyframes balloon-float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+}
+
+@keyframes celebration-burst {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(0.8) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
 /* Utility classes */
 .animate-float {
   animation: float 6s ease-in-out infinite;
@@ -212,6 +247,18 @@
 
 .animate-particle-float {
   animation: particle-float 8s ease-in-out infinite;
+}
+
+.animate-balloon-float {
+  animation: balloon-float 3s ease-in-out infinite;
+}
+
+.animate-celebration-burst {
+  animation: celebration-burst 1s ease-out forwards;
+}
+
+.animate-sparkle-twinkle {
+  animation: sparkle-twinkle 1.5s ease-in-out infinite;
 }
 
 /* Card hover effects */
